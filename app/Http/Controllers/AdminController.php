@@ -475,4 +475,47 @@ class AdminController extends Controller
 
         return redirect()->route('admin.settings.qris')->with('success', 'Gambar dan Pengaturan QRIS berhasil diperbarui!');
     }
+
+    /**
+     * Halaman Edit Profil Akun Admin / Kasir.
+     */
+    public function profileIndex()
+    {
+        $user = auth()->user();
+        return view('admin.profile', compact('user'));
+    }
+
+    /**
+     * Simpan Perubahan Profil & Password Akun Admin / Kasir.
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:4|confirmed',
+        ], [
+            'username.unique' => 'Username ini sudah digunakan oleh akun lain.',
+            'email.unique' => 'Email ini sudah terdaftar di sistem.',
+            'password.min' => 'Password minimal 4 karakter.',
+            'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+        ]);
+
+        $userData = [
+            'name' => $request->input('name'),
+            'username' => $request->input('username'),
+            'email' => $request->input('email'),
+        ];
+
+        if ($request->filled('password')) {
+            $userData['password'] = \Illuminate\Support\Facades\Hash::make($request->input('password'));
+        }
+
+        $user->update($userData);
+
+        return redirect()->route('admin.profile')->with('success', 'Profil dan kredensial akun berhasil diperbarui! Silakan gunakan data baru untuk login berikutnya.');
+    }
 }

@@ -210,13 +210,13 @@
             
             <div class="footer-info">
                 <strong>Lokasi :</strong>
-                <p>Jl. Supriyadi No. 40, Sukapura, Purwokerto Wetan, Kabupaten Banyumas, Jawa Tengah 53111, Indonesia</p>
+                <p>Jl. Supriyadi No. 40, Purwokerto</p>
                 
                 <strong>Jam Operasional :</strong>
                 <p>Senin - Minggu (Pukul 10.00 - 21.00 WIB)</p>
                 
-                <strong>Menerima Pesanan :</strong>
-                <p>+62 812-2591-1012</p>
+                <strong>Info &amp; Pemesanan :</strong>
+                <p><a href="https://wa.me/6287730712015" target="_blank" style="color: #FBBF24; text-decoration: none; font-weight: 800;"><i class="fa-brands fa-whatsapp"></i> 0877 3071 2015</a></p>
             </div>
         </footer>
     </div>

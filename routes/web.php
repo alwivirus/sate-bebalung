@@ -66,4 +66,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Pengaturan QRIS Pembayaran Toko
     Route::get('/settings/qris', [AdminController::class, 'qrisIndex'])->name('settings.qris');
     Route::post('/settings/qris', [AdminController::class, 'updateQris'])->name('settings.qris.update');
+
+    // Edit Profil Akun, Email & Ganti Password Admin/Kasir
+    Route::get('/profile', [AdminController::class, 'profileIndex'])->name('profile');
+    Route::post('/profile', [AdminController::class, 'updateProfile'])->name('profile.update');
 });

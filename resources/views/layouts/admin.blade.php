@@ -255,6 +255,12 @@
                 </a>
             </li>
             <li>
+                <a href="{{ route('admin.profile') }}" class="nav-link {{ request()->routeIs('admin.profile') ? 'active' : '' }}">
+                    <i class="fa-solid fa-user-gear"></i>
+                    <span>Edit Profil & Password</span>
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('customer.menu') }}" target="_blank" class="nav-link">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i>
                     <span>Tampilan Pelanggan</span>
@@ -267,7 +273,7 @@
                 <i class="fa-solid fa-user-check"></i> {{ auth()->user()->name ?? 'Kasir' }}
             </div>
             <div style="font-size: 0.7rem; color: #9CA3AF; margin-top: 2px;">
-                Role: {{ strtoupper(auth()->user()->role ?? 'KASIR') }}
+                Role: {{ strtoupper(auth()->user()->role ?? 'KASIR') }} &bull; <a href="{{ route('admin.profile') }}" style="color: #FBBF24; text-decoration: underline;">Ubah Akun</a>
             </div>
             <form action="{{ route('logout') }}" method="POST" style="margin-top: 8px;">
                 @csrf
@@ -287,7 +293,7 @@
         <header class="top-navbar">
             <h2 style="font-size: 1.15rem; font-weight: 800;">@yield('page-title', 'Dashboard')</h2>
             <div style="display: flex; align-items: center; gap: 14px;">
-                <div style="display: flex; align-items: center; gap: 8px; background: #F3F4F6; padding: 6px 12px; border-radius: 8px;">
+                <a href="{{ route('admin.profile') }}" style="display: flex; align-items: center; gap: 8px; background: #F3F4F6; padding: 6px 12px; border-radius: 8px; text-decoration: none; border: 1.5px solid var(--border-color);" title="Klik untuk edit profil akun">
                     <i class="fa-solid fa-user-shield" style="color: #EA580C;"></i>
                     <div style="font-size: 0.82rem; font-weight: 800; color: #111827;">
                         {{ auth()->user()->name ?? 'Kasir' }}
@@ -295,7 +301,7 @@
                             {{ strtoupper(auth()->user()->role ?? 'KASIR') }}
                         </span>
                     </div>
-                </div>
+                </a>
 
                 <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
                     @csrf

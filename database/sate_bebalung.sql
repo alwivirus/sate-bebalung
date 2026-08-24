@@ -76,20 +76,21 @@ CREATE TABLE `menus` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `menus` (`id`, `category_id`, `name`, `slug`, `description`, `price`, `image`, `badge`, `is_available`, `sort_order`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Paket Hemat Bebalung 1', 'paket-hemat-bebalung-1', 'Sate Kambing (5 tusuk) + Sop Bebalung Gurih + Nasi Putih + Es Teh', 45000.00, 'images/menus/paket_murah.png', 'FAVORIT', 1, 1, NOW(), NOW()),
-(2, 1, 'Paket Bebalung Berdua', 'paket-bebalung-berdua', 'Sate Kambing (10 tusuk) + Tongseng Kambing + 2 Nasi Gurih + 2 Es Jeruk', 85000.00, 'images/menus/paket_murah.png', 'HEMAT 20%', 1, 2, NOW(), NOW()),
-(3, 2, 'Sate Bebalung Polos (10 Tusuk)', 'sate-bebalung-polos-10-tusuk', '10 tusuk daging kambing muda pilihan tanpa lemak dengan bumbu rempah khas', 42000.00, 'images/menus/sate_kambing_polos.png', 'BEST SELLER', 1, 3, NOW(), NOW()),
-(4, 2, 'Sate Bebalung Campur (10 Tusuk)', 'sate-bebalung-campur-10-tusuk', '10 tusuk daging kambing muda gurih kombinasi selingan lemak renyah juicy', 38000.00, 'images/menus/sate_kambing_campur.png', 'POPULER', 1, 4, NOW(), NOW()),
-(5, 2, 'Sate Ayam Gurih (10 Tusuk)', 'sate-ayam-gurih-10-tusuk', '10 tusuk daging ayam empuk bakar bumbu kacang istimewa', 28000.00, 'images/menus/sate_ayam.png', NULL, 1, 5, NOW(), NOW()),
-(6, 3, 'Sop Bebalung Iga Kambing', 'sop-bebalung-iga-kambing', 'Sup iga kambing empuk kuah kaldu rempah segar khas Sasak Lombok', 35000.00, 'images/menus/sop_kambing.png', 'REKOMENDASI', 1, 6, NOW(), NOW()),
-(7, 3, 'Gulai Bebalung Rempah', 'gulai-bebalung-rempah', 'Gulai kambing kuah santan pekat aroma rempah nusantara yang hangat gurih', 35000.00, 'images/menus/gulai_kambing.png', NULL, 1, 7, NOW(), NOW()),
-(8, 3, 'Tongseng Kambing Pedas', 'tongseng-kambing-pedas', 'Potongan kambing empuk dimasak kuah tongseng manis gurih dengan irisan kol & tomat', 36000.00, 'images/menus/tongseng_kambing.png', 'PEDAS MANTAP', 1, 8, NOW(), NOW()),
-(9, 4, 'Es Teh Manis Segar', 'es-teh-manis-segar', 'Teh racikan asli wangi melati disajikan dingin menyegarkan', 5000.00, 'images/menus/es_teh_manis.png', NULL, 1, 9, NOW(), NOW()),
-(10, 4, 'Es Jeruk Peras Murni', 'es-jeruk-peras-murni', 'Perasan jeruk asli segar kaya vitamin C', 8000.00, 'images/menus/es_jeruk.png', 'SEGAR', 1, 10, NOW(), NOW()),
-(11, 4, 'Teh Poci Gula Batu', 'teh-poci-gula-batu', 'Teh poci tanah liat panas harum dengan gula batu tradisional', 10000.00, 'images/menus/teh_poci.png', 'KLASIK', 1, 11, NOW(), NOW()),
-(12, 4, 'Kopi Toebroek Mantap', 'kopi-toebroek-mantap', 'Kopi hitam tubruk biji kopi nusantara pilihan harum pekat', 7000.00, 'images/menus/kopi_toebroek.svg', NULL, 1, 12, NOW(), NOW()),
-(13, 5, 'Nasi Putih Pulen', 'nasi-putih-pulen', 'Satu porsi nasi putih hangat pulen harum', 5000.00, 'images/menus/nasi_putih.png', NULL, 1, 13, NOW(), NOW()),
-(14, 5, 'Nasi Gurih Rempah', 'nasi-gurih-rempah', 'Nasi dengan bumbu gurih rempah aromatik daun jeruk', 7000.00, 'images/menus/nasi_gurih.png', 'GURIH', 1, 14, NOW(), NOW());
+(1, 1, 'Sate Kambing (Polos)', 'sate-kambing-polos', '10 Tusuk Sate Full Daging kambing muda empuk bumbu rempah khas Be Ba Lung.', 50000.00, 'images/menus/sate_kambing_polos.jpg', 'BEST SELLER', 1, 1, NOW(), NOW()),
+(2, 1, 'Sate Kambing (Campur)', 'sate-kambing-campur', '10 Tusuk Sate Daging + Ati / Lemak gurih renyah aroma panggangan khas.', 45000.00, 'images/menus/sate_kambing_campur.jpg', 'FAVORIT', 1, 2, NOW(), NOW()),
+(3, 1, 'Tongseng Kambing', 'tongseng-kambing', 'Olahan daging kambing kuah tongseng gurih segar dengan irisan kol dan tomat.', 35000.00, 'images/menus/tongseng_kambing.jpg', 'REKOMENDASI', 1, 3, NOW(), NOW()),
+(4, 1, 'Sop Kambing', 'sop-kambing', 'Kuah bening rempah harum segar dengan potongan daging dan iga kambing lembut.', 30000.00, 'images/menus/sop_kambing.jpg', 'SEGAR GURIH', 1, 4, NOW(), NOW()),
+(5, 1, 'Gulai Kambing', 'gulai-kambing', 'Gulai kambing kuah santan kental rempah istimewa yang gurih dan sedap.', 30000.00, 'images/menus/gulai_kambing.jpg', NULL, 1, 5, NOW(), NOW()),
+(6, 1, 'Sate Ayam', 'sate-ayam', 'Sate daging ayam bakar bumbu kacang gurih manis dengan taburan bawang goreng.', 20000.00, 'images/menus/sate_ayam.jpg', NULL, 1, 6, NOW(), NOW()),
+(7, 1, 'Nasi Putih', 'nasi-putih', 'Satu porsi nasi putih hangat pulen harum.', 6000.00, 'images/menus/nasi_putih.jpg', NULL, 1, 7, NOW(), NOW()),
+(8, 1, 'Nasi Gurih', 'nasi-gurih', 'Nasi gurih rempah santan daun jeruk dengan taburan bawang goreng.', 7500.00, 'images/menus/nasi_gurih.jpg', 'GURIH', 1, 8, NOW(), NOW()),
+(9, 2, 'Air Putih / Teh Tawar', 'air-putih-teh-tawar', 'Air mineral / teh tawar hangat segar higienis.', 2000.00, 'images/menus/air_putih.jpg', NULL, 1, 9, NOW(), NOW()),
+(10, 2, 'Es Teh Tawar', 'es-teh-tawar', 'Es teh tawar dingin segar pelepas dahaga.', 3000.00, 'images/menus/es_teh_tawar.jpg', NULL, 1, 10, NOW(), NOW()),
+(11, 2, 'Es Teh Manis', 'es-teh-manis', 'Es teh manis segar wangi melati asli.', 4000.00, 'images/menus/es_teh_manis.jpg', 'SEGAR', 1, 11, NOW(), NOW()),
+(12, 2, 'Air Jeruk / Panas', 'air-jeruk-panas', 'Perasan jeruk murni hangat kaya vitamin C.', 8000.00, 'images/menus/jeruk_panas.jpg', 'HANGAT', 1, 12, NOW(), NOW()),
+(13, 2, 'Es Jeruk', 'es-jeruk', 'Perasan jeruk segar asli dingin nikmat.', 10000.00, 'images/menus/es_jeruk.jpg', 'FAVORIT', 1, 13, NOW(), NOW()),
+(14, 2, 'Teh Poci', 'teh-poci', 'Teh poci tanah liat tradisional disajikan hangat dengan gula batu.', 15000.00, 'images/menus/teh_poci.jpg', 'KLASIK', 1, 14, NOW(), NOW()),
+(15, 2, 'Kopi Toebroek', 'kopi-toebroek', 'Kopi hitam tubruk biji kopi nusantara pilihan harum mantap.', 5000.00, 'images/menus/kopi_toebroek.svg', 'MANTAP', 1, 15, NOW(), NOW());
 
 -- --------------------------------------------------------
 -- Table: tables
