@@ -41,6 +41,10 @@ try {
             } else {
                 $pdo->exec("ALTER TABLE orders MODIFY COLUMN order_status VARCHAR(50) NOT NULL DEFAULT 'pending'");
             }
+            $checkItemCol = $pdo->query("SHOW COLUMNS FROM order_items LIKE 'menu_name'");
+            if ($checkItemCol && $checkItemCol->rowCount() === 0) {
+                $pdo->exec("ALTER TABLE order_items ADD COLUMN menu_name VARCHAR(255) NULL AFTER menu_id");
+            }
 
             // Auto ensure admin user exists with password admin123
             $passHash = password_hash('admin123', PASSWORD_BCRYPT);

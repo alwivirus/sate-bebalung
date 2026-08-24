@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 
 header('Content-Type: text/html; charset=utf-8');
 
-echo "<h2>🛠️ Memperbaiki Database, Schema Orders, Kategori Resmi, QRIS Resmi, Meja Bersih & Permission...</h2>";
+echo "<h2>🛠️ Memperbaiki Database, Schema Orders & Items, Kategori Resmi, QRIS Resmi, Meja Bersih & Permission...</h2>";
 
 $basePath = dirname(__DIR__);
 
@@ -24,6 +24,13 @@ try {
 
     $pdo->exec("ALTER TABLE orders MODIFY COLUMN payment_method VARCHAR(50) NOT NULL DEFAULT 'online'");
     $pdo->exec("ALTER TABLE orders MODIFY COLUMN payment_status VARCHAR(50) NOT NULL DEFAULT 'unpaid'");
+
+    // Cek kolom menu_name di order_items
+    $itemCols = $pdo->query("SHOW COLUMNS FROM order_items LIKE 'menu_name'")->fetchAll();
+    if (empty($itemCols)) {
+        $pdo->exec("ALTER TABLE order_items ADD COLUMN menu_name VARCHAR(255) NULL AFTER menu_id");
+        echo "<p style='color:green;'>✅ Kolom <b>menu_name</b> berhasil ditambahkan ke tabel order_items!</p>";
+    }
 
     // Pastikan user admin dan kasir ada dan bisa login dengan password 'admin123' / 'password'
     $passHash = password_hash('admin123', PASSWORD_BCRYPT);
@@ -77,7 +84,7 @@ try {
         $stmt->execute($m);
     }
 
-    echo "<p style='color:green;'>✅ Kolom payment_method, payment_status, order_status, 15 Menu Resmi, QRIS Resmi & Status Meja Bersih berhasil disinkronkan 100%!</p>";
+    echo "<p style='color:green;'>✅ Kolom payment_method, payment_status, order_status, menu_name, 15 Menu Resmi, QRIS Resmi & Status Meja Bersih berhasil disinkronkan 100%!</p>";
 } catch (\Throwable $e) {
     echo "<p style='color:red;'>⚠️ Database Notice: " . $e->getMessage() . "</p>";
 }

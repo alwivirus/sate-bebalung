@@ -111,6 +111,9 @@ class OrderController extends Controller
             if (!\Illuminate\Support\Facades\Schema::hasColumn('orders', 'order_status')) {
                 \Illuminate\Support\Facades\DB::statement("ALTER TABLE orders ADD COLUMN order_status VARCHAR(50) NOT NULL DEFAULT 'pending' AFTER payment_status");
             }
+            if (!\Illuminate\Support\Facades\Schema::hasColumn('order_items', 'menu_name')) {
+                \Illuminate\Support\Facades\DB::statement("ALTER TABLE order_items ADD COLUMN menu_name VARCHAR(255) NULL AFTER menu_id");
+            }
             \Illuminate\Support\Facades\DB::statement("ALTER TABLE orders MODIFY COLUMN payment_method VARCHAR(50) NOT NULL DEFAULT 'online'");
             \Illuminate\Support\Facades\DB::statement("ALTER TABLE orders MODIFY COLUMN payment_status VARCHAR(50) NOT NULL DEFAULT 'unpaid'");
             \Illuminate\Support\Facades\DB::statement("ALTER TABLE orders MODIFY COLUMN order_status VARCHAR(50) NOT NULL DEFAULT 'pending'");
@@ -132,6 +135,7 @@ class OrderController extends Controller
             ]);
 
             $totalAmount = 0;
+            $hasMenuNameCol = \Illuminate\Support\Facades\Schema::hasColumn('order_items', 'menu_name');
 
             foreach ($request->input('cart_items') as $item) {
                 $menu = Menu::find($item['menu_id']);
@@ -140,15 +144,20 @@ class OrderController extends Controller
                     $subtotal = $menu->price * $qty;
                     $totalAmount += $subtotal;
 
-                    OrderItem::create([
+                    $itemPayload = [
                         'order_id' => $order->id,
                         'menu_id' => $menu->id,
-                        'menu_name' => $menu->name,
                         'price' => $menu->price,
                         'quantity' => $qty,
                         'subtotal' => $subtotal,
                         'notes' => $item['notes'] ?? null,
-                    ]);
+                    ];
+
+                    if ($hasMenuNameCol) {
+                        $itemPayload['menu_name'] = $menu->name;
+                    }
+
+                    OrderItem::create($itemPayload);
                 }
             }
 

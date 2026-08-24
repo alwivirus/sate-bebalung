@@ -36,6 +36,14 @@ class OrderItem extends Model
         return $this->belongsTo(Menu::class);
     }
 
+    public function getMenuNameAttribute($value): string
+    {
+        if (!empty($value)) {
+            return $value;
+        }
+        return $this->menu ? $this->menu->name : 'Menu Be Ba Lung';
+    }
+
     public function getFormattedPriceAttribute(): string
     {
         return 'Rp ' . number_format($this->price, 0, ',', '.');
