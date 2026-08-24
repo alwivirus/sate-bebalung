@@ -30,12 +30,7 @@ class OrderController extends Controller
 
         // Auto-heal categories to exact 2 categories matching menu card
         try {
-            if (Category::where('slug', 'paket-murah')->exists() || Category::where('slug', 'makanan')->doesntExist() || Menu::count() < 15) {
-                \Illuminate\Support\Facades\DB::statement("SET FOREIGN_KEY_CHECKS=0");
-                Menu::truncate();
-                Category::truncate();
-                \Illuminate\Support\Facades\DB::statement("SET FOREIGN_KEY_CHECKS=1");
-
+            if (Category::where('slug', 'paket-murah')->exists() || Category::count() < 2 || Menu::count() < 15) {
                 (new \Database\Seeders\CategorySeeder())->run();
                 (new \Database\Seeders\MenuSeeder())->run();
             }
