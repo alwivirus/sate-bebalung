@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Menu;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Setting;
 use App\Models\Table;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class AdminController extends Controller
