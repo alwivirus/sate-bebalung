@@ -184,34 +184,34 @@
     /* Chatbot Modal Window */
     .chatbot-modal {
         position: fixed;
-        bottom: 80px;
+        bottom: 76px;
         right: 16px;
-        width: 360px;
+        width: 330px;
         max-width: calc(100vw - 28px);
-        height: 480px;
-        max-height: calc(100dvh - 110px);
+        height: 400px;
+        max-height: 58vh;
         background-color: #F9FAFB;
-        border: 2.5px solid #1E1E1E;
-        border-radius: 20px;
-        box-shadow: 4px 6px 0px #1E1E1E;
+        border: 2px solid #1E1E1E;
+        border-radius: 16px;
+        box-shadow: 4px 4px 0px #1E1E1E;
         display: none;
         flex-direction: column;
         overflow: hidden;
-        animation: modalPop 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        animation: modalPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         z-index: 9999;
     }
 
     @media (max-width: 480px) {
         #bebalung-chatbot-container {
             right: 12px;
-            bottom: 78px;
+            bottom: 74px;
         }
 
         .chatbot-fab {
-            padding: 3px;
+            padding: 2px;
             border-radius: 50%;
-            width: 46px;
-            height: 46px;
+            width: 42px;
+            height: 42px;
             justify-content: center;
         }
 
@@ -225,21 +225,21 @@
 
         .chatbot-modal {
             right: 12px;
-            left: 12px;
-            width: auto;
-            max-width: none;
-            bottom: 74px;
-            height: 440px;
-            max-height: calc(100dvh - 100px);
-            border-radius: 18px;
+            left: auto;
+            width: 300px;
+            max-width: 86vw;
+            bottom: 72px;
+            height: 380px;
+            max-height: 55vh;
+            border-radius: 14px;
         }
     }
 
     /* Header */
     .chatbot-header {
         background-color: #FFB703;
-        border-bottom: 3px solid #1E1E1E;
-        padding: 12px 16px;
+        border-bottom: 2px solid #1E1E1E;
+        padding: 8px 12px;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -248,14 +248,14 @@
     .chat-header-info {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
     }
 
     .chat-header-avatar {
-        width: 40px;
-        height: 40px;
+        width: 32px;
+        height: 32px;
         background: #FFFFFF;
-        border: 2px solid #1E1E1E;
+        border: 1.5px solid #1E1E1E;
         border-radius: 50%;
         overflow: visible;
         position: relative;
@@ -271,17 +271,17 @@
 
     .status-dot {
         position: absolute;
-        bottom: -2px;
-        right: -2px;
-        width: 11px;
-        height: 11px;
+        bottom: -1px;
+        right: -1px;
+        width: 9px;
+        height: 9px;
         background-color: #10B981;
-        border: 2px solid #1E1E1E;
+        border: 1.5px solid #1E1E1E;
         border-radius: 50%;
     }
 
     .chat-title {
-        font-size: 0.95rem;
+        font-size: 0.85rem;
         font-weight: 900;
         color: #111827;
         margin: 0;
@@ -289,30 +289,30 @@
     }
 
     .chat-subtitle {
-        font-size: 0.72rem;
+        font-size: 0.65rem;
         font-weight: 700;
-        color: #6B7280;
-        margin: 2px 0 0 0;
+        color: #4B5563;
+        margin: 1px 0 0 0;
     }
 
     .chat-header-actions {
         display: flex;
-        gap: 6px;
+        gap: 5px;
     }
 
     .chat-icon-btn {
-        width: 32px;
-        height: 32px;
+        width: 26px;
+        height: 26px;
         background: #FFFFFF;
-        border: 2px solid #1E1E1E;
-        border-radius: 8px;
-        box-shadow: 2px 2px 0px #1E1E1E;
+        border: 1.5px solid #1E1E1E;
+        border-radius: 6px;
+        box-shadow: 1.5px 1.5px 0px #1E1E1E;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #1E1E1E;
-        font-size: 0.85rem;
+        font-size: 0.75rem;
         transition: all 0.1s ease;
     }
 
@@ -322,38 +322,38 @@
 
     .chat-icon-btn:active {
         transform: translate(1px, 1px);
-        box-shadow: 1px 1px 0px #1E1E1E;
+        box-shadow: 0px 0px 0px #1E1E1E;
     }
 
     /* Message Body */
     .chatbot-body {
         flex: 1;
-        padding: 14px 12px;
+        padding: 10px 8px;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
         background: #F3F4F6;
         scroll-behavior: smooth;
     }
 
     /* Message Bubbles */
     .chat-bubble {
-        max-width: 88%;
-        padding: 10px 14px;
-        border-radius: 16px;
-        font-size: 0.85rem;
-        line-height: 1.45;
-        border: 2px solid #1E1E1E;
+        max-width: 90%;
+        padding: 8px 10px;
+        border-radius: 12px;
+        font-size: 0.78rem;
+        line-height: 1.35;
+        border: 1.5px solid #1E1E1E;
         word-wrap: break-word;
-        box-shadow: 2px 2px 0px rgba(0,0,0,0.15);
+        box-shadow: 1.5px 1.5px 0px rgba(0,0,0,0.1);
     }
 
     .chat-bubble.bot {
         align-self: flex-start;
         background-color: #FFFFFF;
         color: #1F2937;
-        border-bottom-left-radius: 4px;
+        border-bottom-left-radius: 3px;
     }
 
     .chat-bubble.user {
@@ -361,12 +361,12 @@
         background-color: #FFB703;
         color: #111827;
         font-weight: 700;
-        border-bottom-right-radius: 4px;
-        box-shadow: 2px 2px 0px #1E1E1E;
+        border-bottom-right-radius: 3px;
+        box-shadow: 1.5px 1.5px 0px #1E1E1E;
     }
 
     .chat-bubble-text p {
-        margin: 0 0 6px 0;
+        margin: 0 0 4px 0;
     }
 
     .chat-bubble-text p:last-child {
@@ -382,32 +382,27 @@
     .chat-food-cards {
         display: flex;
         flex-direction: column;
-        gap: 10px;
-        margin-top: 10px;
+        gap: 6px;
+        margin-top: 6px;
         width: 100%;
     }
 
     .chat-food-card {
         background: #FFFFFF;
-        border: 2px solid #1E1E1E;
-        border-radius: 14px;
-        box-shadow: 3px 3px 0px #1E1E1E;
-        padding: 8px 10px;
+        border: 1.5px solid #1E1E1E;
+        border-radius: 10px;
+        box-shadow: 2px 2px 0px #1E1E1E;
+        padding: 5px 8px;
         display: flex;
         align-items: center;
-        gap: 10px;
-        transition: transform 0.1s ease;
-    }
-
-    .chat-food-card:hover {
-        transform: translateY(-1px);
+        gap: 8px;
     }
 
     .chat-food-img {
-        width: 58px;
-        height: 58px;
-        border-radius: 10px;
-        border: 1.5px solid #1E1E1E;
+        width: 42px;
+        height: 42px;
+        border-radius: 8px;
+        border: 1px solid #1E1E1E;
         object-fit: cover;
         flex-shrink: 0;
         background: #E5E7EB;
@@ -420,18 +415,18 @@
 
     .chat-food-badge {
         display: inline-block;
-        font-size: 0.65rem;
+        font-size: 0.6rem;
         font-weight: 800;
         background-color: #FEF3C7;
         color: #B45309;
         border: 1px solid #D97706;
-        padding: 1px 6px;
-        border-radius: 6px;
-        margin-bottom: 3px;
+        padding: 0px 4px;
+        border-radius: 4px;
+        margin-bottom: 2px;
     }
 
     .chat-food-name {
-        font-size: 0.84rem;
+        font-size: 0.75rem;
         font-weight: 800;
         color: #111827;
         margin: 0;
@@ -441,25 +436,25 @@
     }
 
     .chat-food-price {
-        font-size: 0.8rem;
+        font-size: 0.72rem;
         font-weight: 800;
         color: #DC2626;
-        margin: 2px 0 0 0;
+        margin: 1px 0 0 0;
     }
 
     .chat-add-btn {
         background-color: #FFB703;
-        border: 2px solid #1E1E1E;
-        border-radius: 8px;
-        box-shadow: 2px 2px 0px #1E1E1E;
+        border: 1.5px solid #1E1E1E;
+        border-radius: 6px;
+        box-shadow: 1.5px 1.5px 0px #1E1E1E;
         font-weight: 800;
-        font-size: 0.72rem;
-        padding: 6px 8px;
+        font-size: 0.68rem;
+        padding: 4px 6px;
         cursor: pointer;
         color: #111827;
         display: inline-flex;
         align-items: center;
-        gap: 4px;
+        gap: 3px;
         flex-shrink: 0;
         transition: all 0.1s ease;
         white-space: nowrap;
