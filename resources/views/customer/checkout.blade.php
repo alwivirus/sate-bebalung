@@ -286,21 +286,42 @@
                 <div class="radio-circle"></div>
             </div>
 
-            <!-- Form Meja & Catatan (Opsional) -->
-            <div style="background: white; border: 3px solid var(--dark-border); border-radius: 16px; padding: 14px; margin-top: 16px; box-shadow: var(--box-shadow-brutal);">
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.75rem; font-weight: 800; color: #4B5563; display: block; margin-bottom: 4px;">NOMOR MEJA</label>
-                        <input type="text" name="table_number" value="{{ $tableNumber }}" style="width: 100%; padding: 8px 10px; border: 2px solid var(--dark-border); border-radius: 8px; font-weight: 800;" required>
+            <!-- Form Meja & Catatan -->
+            <div style="background: white; border: 3px solid var(--dark-border); border-radius: 16px; padding: 16px; margin-top: 16px; box-shadow: var(--box-shadow-brutal);">
+                <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                    <div style="width: 105px;">
+                        <label style="font-size: 0.75rem; font-weight: 900; color: #111827; display: flex; align-items: center; gap: 4px; margin-bottom: 5px;">
+                            <i class="fa-solid fa-qrcode" style="color: #F59E0B;"></i> MEJA
+                        </label>
+                        <div style="background: #FEF3C7; border: 2.5px solid var(--dark-border); border-radius: 10px; padding: 8px 10px; font-weight: 900; font-size: 1rem; color: #111827; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 1.5px 1.5px 0px var(--dark-border);">
+                            <span>#{{ $tableNumber }}</span>
+                            <i class="fa-solid fa-circle-check" style="color: #059669; font-size: 0.8rem;" title="Meja Terverifikasi Hasil Scan QR"></i>
+                        </div>
+                        <input type="hidden" name="table_number" value="{{ $tableNumber }}">
                     </div>
-                    <div style="flex: 2;">
-                        <label style="font-size: 0.75rem; font-weight: 800; color: #4B5563; display: block; margin-bottom: 4px;">NAMA PEMESAN</label>
-                        <input type="text" name="customer_name" value="{{ $customerName }}" style="width: 100%; padding: 8px 10px; border: 2px solid var(--dark-border); border-radius: 8px; font-weight: 800;" placeholder="Contoh: Budi">
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.75rem; font-weight: 900; color: #111827; display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+                            <span><i class="fa-solid fa-user" style="color: #4B5563;"></i> NAMA PEMESAN</span>
+                            <span style="color: #DC2626; font-size: 0.7rem; font-weight: 800;">* WAJIB DIISI</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            name="customer_name" 
+                            id="customerNameInput"
+                            value="{{ $customerName !== 'Pelanggan' ? $customerName : '' }}" 
+                            style="width: 100%; padding: 9px 12px; border: 2.5px solid var(--dark-border); border-radius: 10px; font-weight: 800; font-size: 0.95rem; background: #FFFDF7;" 
+                            placeholder="Ketik nama Anda (cth: Budi / Ani)..." 
+                            required 
+                            minlength="2"
+                            autocomplete="name"
+                        >
                     </div>
                 </div>
                 <div>
-                    <label style="font-size: 0.75rem; font-weight: 800; color: #4B5563; display: block; margin-bottom: 4px;">CATATAN PESANAN (OPSIONAL)</label>
-                    <input type="text" name="notes" style="width: 100%; padding: 8px 10px; border: 2px solid var(--dark-border); border-radius: 8px; font-size: 0.85rem;" placeholder="Misal: Sate tidak pakai bawang merah...">
+                    <label style="font-size: 0.75rem; font-weight: 800; color: #4B5563; display: block; margin-bottom: 5px;">
+                        <i class="fa-solid fa-pen-to-square"></i> CATATAN PESANAN (OPSIONAL)
+                    </label>
+                    <input type="text" name="notes" style="width: 100%; padding: 8px 12px; border: 2px solid var(--dark-border); border-radius: 8px; font-size: 0.85rem;" placeholder="Misal: Sate tidak pedas, kuah gulai dipisah...">
                 </div>
             </div>
 
@@ -331,6 +352,19 @@
         } else {
             document.getElementById('opt-kasir').classList.add('active');
         }
+    }
+
+    const payForm = document.getElementById('paymentForm');
+    if (payForm) {
+        payForm.addEventListener('submit', function(e) {
+            const nameInput = document.getElementById('customerNameInput');
+            if (nameInput && nameInput.value.trim().length < 2) {
+                e.preventDefault();
+                alert('Silakan isi Nama Pemesan terlebih dahulu agar pesanan dapat diantar dengan tepat ke Meja #{{ $tableNumber }}.');
+                nameInput.focus();
+                return false;
+            }
+        });
     }
 
     // Auto-restore cart from localStorage if PHP session is empty

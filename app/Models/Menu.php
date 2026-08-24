@@ -72,7 +72,6 @@ class Menu extends Model
         if (str_contains($name, 'nasi gurih')) return asset('images/menus/nasi_gurih.jpg');
         if (str_contains($name, 'paket')) return asset('images/menus/paket_murah.jpg');
         if (str_contains($name, 'poci')) return asset('images/menus/teh_poci.jpg');
-        if (str_contains($name, 'kopi') || str_contains($name, 'toebroek') || str_contains($name, 'tubruk')) return asset('images/menus/kopi_toebroek.svg');
         if (str_contains($name, 'air') || str_contains($name, 'mineral')) return asset('images/menus/air_putih.jpg');
         if (str_contains($name, 'es teh')) return asset('images/menus/es_teh_manis.jpg');
         if (str_contains($name, 'teh')) return asset('images/menus/teh_tawar.jpg');

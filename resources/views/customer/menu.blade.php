@@ -329,10 +329,11 @@
 <div class="table-bar">
     <div class="table-badge">
         <i class="fa-solid fa-qrcode"></i>
-        <span>Scan Meja: #{{ $tableNumber }}</span>
+        <span>Meja #{{ $tableNumber }}</span>
     </div>
-    <div style="font-size: 0.75rem; color: #4B5563;">
-        <i class="fa-solid fa-clock"></i> Pesan Langsung
+    <div style="font-size: 0.72rem; color: #065F46; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; background: #D1FAE5; padding: 4px 8px; border-radius: 6px; border: 1px solid #10B981;">
+        <span style="width: 7px; height: 7px; background: #10B981; border-radius: 50%; display: inline-block; box-shadow: 0 0 6px #10B981;"></span>
+        <span>Terhubung ke Kasir (Sedang Dipakai)</span>
     </div>
 </div>
 
@@ -406,7 +407,7 @@
     <form id="checkoutForm" action="{{ route('customer.checkout') }}" method="POST" style="margin: 0;" onsubmit="return prepareCheckout(event);">
         @csrf
         <input type="hidden" name="table_number" value="{{ $tableNumber }}">
-        <input type="hidden" name="customer_name" value="{{ $customerName }}">
+        <input type="hidden" name="customer_name" value="{{ $customerName !== 'Pelanggan' ? $customerName : '' }}">
         <input type="hidden" name="cart" id="cartPayload" value="{}">
         <button type="submit" class="checkout-btn" id="btnCheckoutSubmit">
             <span>Pesan Sekarang</span>

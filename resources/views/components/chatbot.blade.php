@@ -188,8 +188,8 @@
         right: 20px;
         width: 390px;
         max-width: calc(100vw - 32px);
-        height: 580px;
-        max-height: calc(100vh - 110px);
+        height: 560px;
+        max-height: calc(100dvh - 110px);
         background-color: #F9FAFB;
         border: 3.5px solid #1E1E1E;
         border-radius: 24px;
@@ -199,6 +199,14 @@
         overflow: hidden;
         animation: modalPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         z-index: 10001;
+    }
+
+    @media (max-height: 650px) {
+        .chatbot-modal {
+            height: 480px;
+            max-height: calc(100dvh - 90px);
+            bottom: 74px;
+        }
     }
 
     @keyframes modalPop {
@@ -763,11 +771,32 @@
         sendUserMessage(text);
     }
 
+    const PROFANITY_LIST = [
+        'anjing', 'anjir', 'anjay', 'asu', 'bajingan', 'bangsat', 'babi', 'kampret',
+        'kontol', 'kntl', 'memek', 'mmk', 'pantek', 'puki', 'peli', 'itil', 'jembut',
+        'ngentot', 'ngewe', 'titit', 'tetek', 'toket', 'lonte', 'perek', 'pelacur',
+        'tai', 'taek', 'bego', 'goblok', 'tolol', 'peler', 'pepek', 'jancuk', 'jancok', 'dancuk',
+        'fuck', 'bitch', 'shit', 'cunt', 'dick', 'pussy'
+    ];
+
+    function censorClientText(text) {
+        let censored = text;
+        PROFANITY_LIST.forEach(bw => {
+            const regex = new RegExp('\\b' + bw + '\\b', 'gi');
+            censored = censored.replace(regex, match => {
+                const len = match.length;
+                if (len <= 2) return '*'.repeat(len);
+                return match[0] + '*'.repeat(len - 2) + match[len - 1];
+            });
+        });
+        return censored;
+    }
+
     function sendUserMessage(text) {
-        // Append user message
+        // Append user message with censorship
         chatHistory.push({
             sender: 'user',
-            text: text
+            text: censorClientText(text)
         });
         renderChatMessages();
 

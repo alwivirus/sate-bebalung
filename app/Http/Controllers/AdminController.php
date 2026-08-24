@@ -5,17 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Menu;
 use App\Models\Order;
+use App\Models\Setting;
+use App\Models\Table;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
     /**
-     * Dashboard Kasir / Dapur (Monitoring Pesanan Realtime).
+     * Dashboard Kasir / Dapur (Monitoring Pesanan Realtime & Live Status Meja).
      */
     public function dashboard(Request $request)
     {
         $statusFilter = $request->query('status');
+        $paymentFilter = $request->query('payment');
 
         $query = Order::with('items')->latest();
 
@@ -23,17 +27,45 @@ class AdminController extends Controller
             $query->where('order_status', $statusFilter);
         }
 
+        if ($paymentFilter && in_array($paymentFilter, ['unpaid', 'paid', 'cash', 'online'])) {
+            if ($paymentFilter === 'cash') {
+                $query->where('payment_method', 'kasir');
+            } elseif ($paymentFilter === 'online') {
+                $query->where('payment_method', 'online');
+            } else {
+                $query->where('payment_status', $paymentFilter);
+            }
+        }
+
         $orders = $query->paginate(15);
 
+        // Daily, Weekly, Monthly Analytics
+        $today = Carbon::today();
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $endOfWeek = Carbon::now()->endOfWeek();
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
+
         $stats = [
-            'total_orders_today' => Order::whereDate('created_at', today())->count(),
-            'revenue_today' => Order::whereDate('created_at', today())->where('payment_status', 'paid')->sum('total_amount'),
+            'total_orders_today' => Order::whereDate('created_at', $today)->count(),
+            'revenue_today' => Order::whereDate('created_at', $today)->where('payment_status', 'paid')->sum('total_amount'),
+            'revenue_week' => Order::whereBetween('created_at', [$startOfWeek, $endOfWeek])->where('payment_status', 'paid')->sum('total_amount'),
+            'revenue_month' => Order::whereBetween('created_at', [$startOfMonth, $endOfMonth])->where('payment_status', 'paid')->sum('total_amount'),
+            
+            'cash_revenue_today' => Order::whereDate('created_at', $today)->where('payment_status', 'paid')->where('payment_method', 'kasir')->sum('total_amount'),
+            'qris_revenue_today' => Order::whereDate('created_at', $today)->where('payment_status', 'paid')->where('payment_method', 'online')->sum('total_amount'),
+            
             'pending_count' => Order::where('order_status', 'pending')->count(),
             'processing_count' => Order::where('order_status', 'processing')->count(),
+            'unpaid_count' => Order::where('payment_status', 'unpaid')->count(),
             'total_menus' => Menu::count(),
         ];
 
-        return view('admin.dashboard', compact('orders', 'stats', 'statusFilter'));
+        // Live Monitoring Status Meja Terhubung (Terpakai vs Kosong)
+        $liveTables = Table::orderBy('table_number', 'asc')->get();
+        $occupiedTablesCount = Table::where('status', 'occupied')->count();
+
+        return view('admin.dashboard', compact('orders', 'stats', 'statusFilter', 'paymentFilter', 'liveTables', 'occupiedTablesCount'));
     }
 
     /**
@@ -272,5 +304,175 @@ class AdminController extends Controller
 
         $status = $menu->is_available ? 'Tersedia' : 'Habis';
         return redirect()->back()->with('success', "Status menu '{$menu->name}' diubah menjadi {$status}.");
+    }
+
+    /**
+     * Konfirmasi Penerimaan Pembayaran Tunai di Kasir (Cash POS).
+     */
+    public function confirmCashPay(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+        $order->update([
+            'payment_status' => 'paid',
+            'order_status' => $order->order_status === 'pending' ? 'processing' : $order->order_status,
+        ]);
+
+        return redirect()->back()->with('success', "Pembayaran Kasir Pesanan {$order->order_code} (Meja #{$order->table_number} a.n {$order->customer_name}) Rp " . number_format($order->total_amount, 0, ',', '.') . " berhasil DITERIMA LUNAS & tercatat di omset!");
+    }
+
+    /**
+     * Halaman Menu Catatan Aktivitas & Riwayat Uang Masuk (Cash & QRIS).
+     */
+    public function activityLogs(Request $request)
+    {
+        $period = $request->query('period', 'all');
+        $method = $request->query('method');
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+        $search = $request->query('search');
+
+        $query = Order::with('items')->where('payment_status', 'paid')->latest();
+
+        // Filter periode
+        if ($startDate && $endDate) {
+            $query->whereBetween('created_at', [
+                Carbon::parse($startDate)->startOfDay(),
+                Carbon::parse($endDate)->endOfDay(),
+            ]);
+        } elseif ($period === 'today') {
+            $query->whereDate('created_at', Carbon::today());
+        } elseif ($period === 'week') {
+            $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+        } elseif ($period === 'month') {
+            $query->whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year);
+        }
+
+        // Filter metode pembayaran
+        if ($method && in_array($method, ['kasir', 'online'])) {
+            $query->where('payment_method', $method);
+        }
+
+        // Search kode / nama / meja
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('order_code', 'LIKE', "%{$search}%")
+                  ->orWhere('customer_name', 'LIKE', "%{$search}%")
+                  ->orWhere('table_number', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Hitung total ringkasan dari query yang difilter
+        $filteredQuery = clone $query;
+        $totalIncome = (clone $filteredQuery)->sum('total_amount');
+        $cashIncome = (clone $filteredQuery)->where('payment_method', 'kasir')->sum('total_amount');
+        $qrisIncome = (clone $filteredQuery)->where('payment_method', 'online')->sum('total_amount');
+        $totalCount = (clone $filteredQuery)->count();
+
+        $logs = $query->paginate(20)->withQueryString();
+
+        return view('admin.activity_logs', compact(
+            'logs',
+            'totalIncome',
+            'cashIncome',
+            'qrisIncome',
+            'totalCount',
+            'period',
+            'method',
+            'startDate',
+            'endDate',
+            'search'
+        ));
+    }
+
+    /**
+     * Halaman Kelola & Cetak QR Code Meja (Meja 1, Meja 2, dst).
+     */
+    public function tablesIndex(Request $request)
+    {
+        $tableCount = (int) $request->query('count', 20);
+        if ($tableCount < 1) $tableCount = 1;
+        if ($tableCount > 50) $tableCount = 50;
+
+        $baseUrl = url('/');
+        $tables = [];
+
+        for ($i = 1; $i <= $tableCount; $i++) {
+            $tableNum = str_pad($i, 2, '0', STR_PAD_LEFT);
+            $scanUrl = $baseUrl . '/?meja=' . $tableNum;
+            $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' . urlencode($scanUrl) . '&margin=0';
+
+            $dbTable = Table::where('table_number', $tableNum)->first();
+
+            $tables[] = [
+                'number' => $tableNum,
+                'scan_url' => $scanUrl,
+                'qr_image' => $qrApiUrl,
+                'status' => $dbTable ? $dbTable->status : 'available',
+                'customer_name' => $dbTable ? $dbTable->current_customer_name : null,
+                'order_code' => $dbTable ? $dbTable->current_order_code : null,
+                'last_scanned_at' => $dbTable ? $dbTable->last_scanned_at : null,
+                'active_orders_count' => Order::where('table_number', $tableNum)->whereIn('order_status', ['pending', 'processing'])->count(),
+            ];
+        }
+
+        $occupiedCount = Table::where('status', 'occupied')->count();
+
+        return view('admin.tables', compact('tables', 'tableCount', 'baseUrl', 'occupiedCount'));
+    }
+
+    /**
+     * Kosongkan / Reset Status Meja (Setelah Pelanggan Selesai Makan).
+     */
+    public function releaseTable(Request $request, $table_number)
+    {
+        Table::markAvailable($table_number);
+        return redirect()->back()->with('success', "Meja #{$table_number} berhasil dikosongkan & siap untuk pelanggan berikutnya.");
+    }
+
+    /**
+     * Halaman Pengaturan QRIS Pembayaran Toko.
+     */
+    public function qrisIndex()
+    {
+        $qrisImage = Setting::get('qris_image');
+        $merchantName = Setting::get('qris_merchant_name', 'SATE KAMBING BE BA LUNG');
+        $nmid = Setting::get('qris_nmid', 'ID1025428876474');
+
+        return view('admin.settings.qris', compact('qrisImage', 'merchantName', 'nmid'));
+    }
+
+    /**
+     * Update / Ganti Gambar QRIS Toko.
+     */
+    public function updateQris(Request $request)
+    {
+        $request->validate([
+            'merchant_name' => 'nullable|string|max:255',
+            'nmid' => 'nullable|string|max:255',
+            'qris_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:3072',
+        ]);
+
+        if ($request->has('merchant_name')) {
+            Setting::set('qris_merchant_name', $request->input('merchant_name'));
+        }
+
+        if ($request->has('nmid')) {
+            Setting::set('qris_nmid', $request->input('nmid'));
+        }
+
+        if ($request->hasFile('qris_image')) {
+            $file = $request->file('qris_image');
+            $fileName = 'qris_merchant_' . time() . '.' . $file->getClientOriginalExtension();
+            
+            $targetDir = public_path('uploads/settings');
+            if (!file_exists($targetDir)) {
+                mkdir($targetDir, 0755, true);
+            }
+
+            $file->move($targetDir, $fileName);
+            Setting::set('qris_image', 'uploads/settings/' . $fileName);
+        }
+
+        return redirect()->route('admin.settings.qris')->with('success', 'Gambar dan Pengaturan QRIS berhasil diperbarui!');
     }
 }

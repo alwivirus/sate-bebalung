@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Table;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,8 +17,16 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $tableNumber = $request->query('meja', '01');
-        $customerName = $request->query('nama', 'Pelanggan');
+        $tableNumber = $request->query('meja', $request->query('table', session('table_number', '01')));
+        $customerName = $request->query('nama', session('customer_name', ''));
+
+        session(['table_number' => $tableNumber]);
+        if (!empty($customerName)) {
+            session(['customer_name' => $customerName]);
+        }
+
+        // Hubungkan ke sistem: Catat meja sedang di-scan & aktif digunakan
+        Table::markScanned($tableNumber, $customerName);
 
         $categories = Category::with(['menus' => function ($query) {
             $query->where('is_available', true)->orderBy('sort_order', 'asc');
@@ -31,8 +40,13 @@ class OrderController extends Controller
      */
     public function checkout(Request $request)
     {
-        $tableNumber = $request->input('table_number', $request->query('meja', session('table_number', '01')));
-        $customerName = $request->input('customer_name', $request->query('nama', session('customer_name', 'Pelanggan')));
+        $tableNumber = $request->input('table_number', $request->query('meja', $request->query('table', session('table_number', '01'))));
+        $customerName = $request->input('customer_name', $request->query('nama', session('customer_name', '')));
+
+        session(['table_number' => $tableNumber]);
+
+        // Hubungkan ke sistem: Catat meja sedang aktif checkout
+        Table::markScanned($tableNumber, $customerName);
 
         $rawCart = $request->input('cart');
         $cartData = [];
@@ -41,7 +55,10 @@ class OrderController extends Controller
             $parsed = is_array($rawCart) ? $rawCart : json_decode($rawCart, true);
             if (is_array($parsed) && !empty($parsed)) {
                 $cartData = $parsed;
-                session(['cart' => $cartData, 'table_number' => $tableNumber, 'customer_name' => $customerName]);
+                session(['cart' => $cartData, 'table_number' => $tableNumber]);
+                if (!empty($customerName)) {
+                    session(['customer_name' => $customerName]);
+                }
             }
         }
 
@@ -79,6 +96,7 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'customer_name' => 'required|string|min:2|max:100',
             'table_number' => 'required|string',
             'payment_method' => 'required|in:online,kasir',
             'cart_items' => 'required|array|min:1',
@@ -89,7 +107,7 @@ class OrderController extends Controller
 
             $order = Order::create([
                 'order_code' => $orderCode,
-                'customer_name' => $request->input('customer_name') ?: ('Pelanggan Meja ' . $request->input('table_number')),
+                'customer_name' => trim($request->input('customer_name')),
                 'table_number' => $request->input('table_number', '01'),
                 'payment_method' => $request->input('payment_method', 'online'),
                 'payment_status' => 'unpaid',
@@ -120,6 +138,9 @@ class OrderController extends Controller
             }
 
             $order->update(['total_amount' => $totalAmount]);
+
+            // Hubungkan ke sistem: Catat meja telah membuat pesanan aktif
+            Table::markOrdering($order->table_number, $order->customer_name, $order->order_code);
 
             // Bersihkan cart di session & simpan kode pesanan terakhir
             session()->forget('cart');

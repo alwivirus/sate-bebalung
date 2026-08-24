@@ -237,14 +237,47 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('customer.menu') }}" target="_blank" class="nav-link">
+                <a href="{{ route('admin.activity-logs') }}" class="nav-link {{ request()->routeIs('admin.activity-logs') ? 'active' : '' }}">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Catatan Aktivitas</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.tables.index') }}" class="nav-link {{ request()->routeIs('admin.tables.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-table-cells"></i>
+                    <span>Cetak QR Meja (1-20)</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.settings.qris') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-qrcode"></i>
-                    <span>Scan Meja Pelanggan</span>
+                    <span>Pengaturan QRIS</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('customer.menu') }}" target="_blank" class="nav-link">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    <span>Tampilan Pelanggan</span>
                 </a>
             </li>
         </ul>
 
-        <div style="font-size: 0.75rem; color: #6B7280; text-align: center; padding-top: 12px;">
+        <div style="padding: 12px 14px; background: #1F2937; border-radius: 10px; margin-top: 14px; text-align: left;">
+            <div style="font-size: 0.78rem; font-weight: 800; color: #FBBF24;">
+                <i class="fa-solid fa-user-check"></i> {{ auth()->user()->name ?? 'Kasir' }}
+            </div>
+            <div style="font-size: 0.7rem; color: #9CA3AF; margin-top: 2px;">
+                Role: {{ strtoupper(auth()->user()->role ?? 'KASIR') }}
+            </div>
+            <form action="{{ route('logout') }}" method="POST" style="margin-top: 8px;">
+                @csrf
+                <button type="submit" style="width: 100%; background: #EF4444; color: white; border: none; border-radius: 6px; padding: 6px 10px; font-size: 0.75rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Keluar (Logout)
+                </button>
+            </form>
+        </div>
+
+        <div style="font-size: 0.72rem; color: #6B7280; text-align: center; padding-top: 10px;">
             Depot Sate Be Ba Lung v1.0
         </div>
     </aside>
@@ -253,10 +286,24 @@
     <div class="main-wrapper">
         <header class="top-navbar">
             <h2 style="font-size: 1.15rem; font-weight: 800;">@yield('page-title', 'Dashboard')</h2>
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-weight: 700; font-size: 0.85rem; color: #374151;">
-                    <i class="fa-solid fa-user-shield"></i> Kasir Utama
-                </span>
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="display: flex; align-items: center; gap: 8px; background: #F3F4F6; padding: 6px 12px; border-radius: 8px;">
+                    <i class="fa-solid fa-user-shield" style="color: #EA580C;"></i>
+                    <div style="font-size: 0.82rem; font-weight: 800; color: #111827;">
+                        {{ auth()->user()->name ?? 'Kasir' }}
+                        <span style="font-size: 0.7rem; background: #111827; color: #FCD34D; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">
+                            {{ strtoupper(auth()->user()->role ?? 'KASIR') }}
+                        </span>
+                    </div>
+                </div>
+
+                <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                    @csrf
+                    <button type="submit" style="background: #FEE2E2; color: #DC2626; border: 1px solid #FCA5A5; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px;" title="Logout Kasir">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </button>
+                </form>
             </div>
         </header>
 

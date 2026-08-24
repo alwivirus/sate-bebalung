@@ -377,6 +377,12 @@
                             </div>
                         </div>
 
+                        <!-- Catatan Pembayaran Cash/QRIS -->
+                        <div style="margin-bottom: 16px; font-size: 0.78rem; border-radius: 8px; padding: 6px 12px; font-weight: 700; {{ $selectedOrder->payment_method === 'kasir' ? 'background: #FEF3C7; border: 1px solid #F59E0B; color: #92400E;' : 'background: #ECFDF5; border: 1px solid #10B981; color: #065F46;' }}">
+                            <i class="fa-solid {{ $selectedOrder->payment_method === 'kasir' ? 'fa-circle-info' : 'fa-circle-check' }}"></i>
+                            {{ $selectedOrder->payment_method === 'kasir' ? 'Pesanan ini menggunakan Cash (Bayar di Kasir), tapi pendapatan tetap terhitung & tersimpan di database saat lunas.' : 'Pesanan menggunakan QRIS Online, pendapatan otomatis terhitung di sistem.' }}
+                        </div>
+
                         <!-- Barcode Representation -->
                         <div style="background: #F9FAFB; border: 1.5px dashed #D1D5DB; border-radius: 10px; padding: 10px; text-align: center; margin-bottom: 16px;">
                             <svg width="200" height="40" viewBox="0 0 200 40">
@@ -724,6 +730,12 @@
                                 </span>
                             `}
                         </div>
+                    </div>
+
+                    <!-- Catatan Pembayaran Cash / QRIS -->
+                    <div style="margin-bottom: 16px; font-size: 0.78rem; border-radius: 8px; padding: 6px 12px; font-weight: 700; ${order.payment_method === 'kasir' ? 'background: #FEF3C7; border: 1px solid #F59E0B; color: #92400E;' : 'background: #ECFDF5; border: 1px solid #10B981; color: #065F46;'}">
+                        <i class="fa-solid ${order.payment_method === 'kasir' ? 'fa-circle-info' : 'fa-circle-check'}"></i>
+                        ${order.payment_method === 'kasir' ? 'Pesanan ini menggunakan <strong>Cash (Bayar di Kasir)</strong>, tapi pendapatan tetap terhitung & tersimpan di database saat lunas.' : 'Pesanan menggunakan <strong>QRIS Online</strong>, pendapatan otomatis terhitung di sistem.'}
                     </div>
 
                     <!-- Barcode Representation -->

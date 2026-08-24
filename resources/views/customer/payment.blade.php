@@ -187,15 +187,25 @@
             </div>
         </div>
 
+        @php
+            $customQrisImage = \App\Models\Setting::get('qris_image');
+            $customMerchant = \App\Models\Setting::get('qris_merchant_name', 'SATE KAMBING BE BA LUNG');
+            $customNmid = \App\Models\Setting::get('qris_nmid', 'ID1025428876474');
+        @endphp
+
         <div class="qris-merchant-info">
-            <h3>SATE KAMBING BE BA LUNG</h3>
-            <p>NMID : ID1025428876474</p>
-            <p style="font-size: 0.65rem; color: #6B7280;">A01 - Meja #{{ $order->table_number }}</p>
+            <h3>{{ $customMerchant }}</h3>
+            <p>NMID : {{ $customNmid }}</p>
+            <p style="font-size: 0.65rem; color: #6B7280;">A01 - Meja #{{ $order->table_number }} (a.n {{ $order->customer_name }})</p>
         </div>
 
-        <!-- Generated QR Code Image -->
+        <!-- Generated or Custom Uploaded QR Code Image -->
         <div class="qris-qr-box">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=QRIS_DEPOT_BEBALUNG_{{ $order->order_code }}_TOTAL_{{ $order->total_amount }}" alt="QRIS Code">
+            @if($customQrisImage && file_exists(public_path($customQrisImage)))
+                <img src="{{ asset($customQrisImage) }}" alt="QRIS {{ $customMerchant }}">
+            @else
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=QRIS_DEPOT_BEBALUNG_{{ $order->order_code }}_TOTAL_{{ $order->total_amount }}" alt="QRIS Code">
+            @endif
         </div>
 
         <div class="qris-footer-banner">

@@ -155,14 +155,6 @@ class MenuSeeder extends Seeder
                     'is_available' => true,
                     'sort_order' => 7,
                 ],
-                [
-                    'name' => 'Kopi Toebroek',
-                    'description' => 'Kopi hitam tubruk mantap aroma khas nusantara.',
-                    'price' => 5000,
-                    'image' => 'kopi_toebroek.svg',
-                    'is_available' => true,
-                    'sort_order' => 8,
-                ],
             ];
 
             foreach ($minumanItems as $item) {

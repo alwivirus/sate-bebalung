@@ -31,6 +31,19 @@ class ChatbotController extends Controller
 
         $normalized = ' ' . strtolower($message) . ' ';
 
+        // 0. Check for Profanity / Bad words / Bahasa Saru / Kotor (Sensor & Polite Reminder)
+        if ($this->containsProfanity($normalized)) {
+            $reply = "Waduh Kak {$customerName}, mohon gunakan bahasa yang sopan dan santun ya 🙏.\n\n";
+            $reply .= "Chef Bebalung AI siap melayani Kakak dengan sepenuh hati untuk memilihkan hidangan sate kambing empuk, kuah gulai gurih, atau minuman segar terbaik dari dapur kami. Silakan pilih rekomendasi menu lezat di bawah ini ya Kak! ✨";
+
+            return response()->json([
+                'success' => true,
+                'reply' => $reply,
+                'items' => $this->getTopDatabaseMenus(3),
+                'quick_replies' => $this->getDefaultQuickReplies(),
+            ]);
+        }
+
         // 1. Check for Info Restoran / Lokasi / Jam Operasional / Kontak (Priority restaurant info)
         if ($this->hasWordKeywords($normalized, ['lokasi', 'alamat', 'dimana', 'jam buka', 'jam operasional', 'buka jam', 'tutup jam', 'qris', 'pembayaran', 'nomor wa', 'whatsapp', 'no telp', 'telepon', 'reservasi'])) {
             return response()->json($this->handleRestaurantInfoIntent());
@@ -42,7 +55,7 @@ class ChatbotController extends Controller
         }
 
         // 3. Check for Minuman / Haus (e.g. 'rekomendasi minuman', 'es teh', 'jus jeruk')
-        if ($this->hasWordKeywords($normalized, ['minum', 'minuman', 'es jeruk', 'es teh', 'teh manis', 'teh tawar', 'teh poci', 'kopi', 'haus', 'segar dingin', 'seger dingin', 'jus', 'air putih', 'mineral'])) {
+        if ($this->hasWordKeywords($normalized, ['minum', 'minuman', 'es jeruk', 'es teh', 'teh manis', 'teh tawar', 'teh poci', 'haus', 'segar dingin', 'seger dingin', 'jus', 'air putih', 'mineral'])) {
             return response()->json($this->handleDrinkIntent($normalized));
         }
 
@@ -234,9 +247,9 @@ class ChatbotController extends Controller
             ->get();
 
         $reply = "🥤 **Pilihan Minuman Segar & Tradisional Pendamping Santap:**\n\n";
-        $reply .= "• **Teh Poci Gula Batu (⭐ Favorit)**: Teh melati harum khas disajikan di poci tanah liat.\n";
+        $reply .= "• **Teh Poci Gula Batu (⭐ Favorit)**: Teh melati harum khas disajikan di poci tanah liat hangat.\n";
         $reply .= "• **Es Jeruk Segar**: Perasan jeruk asli kaya vitamin C, ampuh netralisir lemak sate.\n";
-        $reply .= "• **Kopi Toebroek**: Kopi hitam mantap dengan aroma nusantara khas.";
+        $reply .= "• **Es Teh Manis / Tawar**: Segar dingin nikmat untuk santap santai.";
 
         return [
             'success' => true,
@@ -493,6 +506,69 @@ class ChatbotController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Check if query contains any profanity, vulgar, or obscene words.
+     */
+    protected function containsProfanity(string $text): bool
+    {
+        $badWords = [
+            // Kata kotor / umpatan Bahasa Indonesia & Daerah
+            'anjing', 'anjir', 'anjay', 'asu', 'bajingan', 'bangsat', 'babi', 'kampret',
+            'kontol', 'kntl', 'memek', 'mmk', 'pantek', 'puki', 'peli', 'itil', 'jembut',
+            'ngentot', 'ngewe', 'titit', 'tetek', 'toket', 'lonte', 'perek', 'pelacur',
+            'tai', 'taek', 'bego', 'goblok', 'tolol', 'idiot', 'peler', 'pepek', 'tempik',
+            'jancuk', 'jancok', 'dancuk', 'cuk', 'celeng', 'bodoh', 'sialan', 'setan', 'iblis',
+            // Bahasa Inggris
+            'fuck', 'fucking', 'bitch', 'shit', 'asshole', 'bastard', 'cunt', 'dick', 'pussy', 'slut', 'whore', 'boobs', 'penis', 'vagina'
+        ];
+
+        $clean = preg_replace('/[^a-zA-Z0-9\s]/', '', strtolower($text));
+        $words = explode(' ', $clean);
+
+        foreach ($words as $w) {
+            $w = trim($w);
+            if (empty($w)) continue;
+            if (in_array($w, $badWords)) {
+                return true;
+            }
+        }
+
+        // Regex pattern for variations like k.o.n.t.o.l or repeated characters
+        foreach ($badWords as $bw) {
+            if (strlen($bw) >= 4 && str_contains($clean, $bw)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Sensor kata kotor dengan karakter asterisk (*).
+     */
+    protected function censorProfanity(string $text): string
+    {
+        $badWords = [
+            'anjing', 'anjir', 'anjay', 'asu', 'bajingan', 'bangsat', 'babi', 'kampret',
+            'kontol', 'kntl', 'memek', 'mmk', 'pantek', 'puki', 'peli', 'itil', 'jembut',
+            'ngentot', 'ngewe', 'titit', 'tetek', 'toket', 'lonte', 'perek', 'pelacur',
+            'tai', 'taek', 'bego', 'goblok', 'tolol', 'peler', 'pepek',
+            'jancuk', 'jancok', 'dancuk', 'fuck', 'bitch', 'shit', 'cunt', 'dick', 'pussy'
+        ];
+
+        foreach ($badWords as $bw) {
+            $len = strlen($bw);
+            if ($len <= 2) {
+                $replacement = str_repeat('*', $len);
+            } else {
+                $replacement = $bw[0] . str_repeat('*', $len - 2) . $bw[$len - 1];
+            }
+            $text = preg_replace('/\b' . preg_quote($bw, '/') . '\b/i', $replacement, $text);
+        }
+
+        return $text;
     }
 
     /**
