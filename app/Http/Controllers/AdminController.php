@@ -670,12 +670,12 @@ class AdminController extends Controller
     }
 
     /**
-     * Sinkronisasi Ulang Database & Menu Resmi.
+     * Sinkronisasi Ulang Database & Menu Resmi (Bisa diakses Admin & Developer).
      */
     public function developerSyncDb(Request $request)
     {
-        if (!auth()->check() || auth()->user()->role !== 'developer') {
-            return redirect()->route('admin.dashboard')->with('error', '⛔ AKSES DITOLAK: Hanya akun Developer yang dapat melakukan Sinkronisasi Database.');
+        if (!auth()->check() || !in_array(auth()->user()->role, ['developer', 'admin'])) {
+            return redirect()->route('admin.dashboard')->with('error', '⛔ AKSES DITOLAK: Fitur ini hanya dapat diakses oleh akun Admin / Developer.');
         }
 
         try {
@@ -701,12 +701,12 @@ class AdminController extends Controller
     }
 
     /**
-     * Bersihkan Cache & Session Aplikasi.
+     * Bersihkan Cache & Session Aplikasi (Bisa diakses Admin & Developer).
      */
     public function developerClearCache(Request $request)
     {
-        if (!auth()->check() || auth()->user()->role !== 'developer') {
-            return redirect()->route('admin.dashboard')->with('error', '⛔ AKSES DITOLAK: Hanya akun Developer yang dapat membersihkan Cache sistem.');
+        if (!auth()->check() || !in_array(auth()->user()->role, ['developer', 'admin'])) {
+            return redirect()->route('admin.dashboard')->with('error', '⛔ AKSES DITOLAK: Fitur ini hanya dapat diakses oleh akun Admin / Developer.');
         }
 
         try {

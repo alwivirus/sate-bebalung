@@ -300,12 +300,30 @@
     <div class="main-wrapper">
         <header class="top-navbar">
             <h2 style="font-size: 1.15rem; font-weight: 800;">@yield('page-title', 'Dashboard')</h2>
-            <div style="display: flex; align-items: center; gap: 14px;">
-                <a href="{{ route('admin.profile') }}" style="display: flex; align-items: center; gap: 8px; background: #F3F4F6; padding: 6px 12px; border-radius: 8px; text-decoration: none; border: 1.5px solid var(--border-color);" title="Klik untuk edit profil akun">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                @if(auth()->user() && in_array(auth()->user()->role, ['developer', 'admin']))
+                    <form action="{{ route('admin.developer.sync-db') }}" method="POST" style="margin: 0;">
+                        @csrf
+                        <button type="submit" style="background: #EEF2FF; color: #4F46E5; border: 1px solid #C7D2FE; padding: 6px 10px; border-radius: 8px; font-size: 0.76rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Sinkronkan Skema Database &amp; Menu Resmi">
+                            <i class="fa-solid fa-rotate"></i>
+                            <span>Sync DB</span>
+                        </button>
+                    </form>
+
+                    <form action="{{ route('admin.developer.clear-cache') }}" method="POST" style="margin: 0;">
+                        @csrf
+                        <button type="submit" style="background: #FEF3C7; color: #B45309; border: 1px solid #FCD34D; padding: 6px 10px; border-radius: 8px; font-size: 0.76rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Bersihkan Cache &amp; Session Laravel">
+                            <i class="fa-solid fa-bolt"></i>
+                            <span>Flush Cache</span>
+                        </button>
+                    </form>
+                @endif
+
+                <a href="{{ route('admin.profile') }}" style="display: flex; align-items: center; gap: 6px; background: #F3F4F6; padding: 6px 10px; border-radius: 8px; text-decoration: none; border: 1.5px solid var(--border-color);" title="Klik untuk edit profil akun">
                     <i class="fa-solid fa-user-shield" style="color: #EA580C;"></i>
-                    <div style="font-size: 0.82rem; font-weight: 800; color: #111827;">
+                    <div style="font-size: 0.8rem; font-weight: 800; color: #111827;">
                         {{ auth()->user()->name ?? 'Kasir' }}
-                        <span style="font-size: 0.7rem; background: #111827; color: #FCD34D; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">
+                        <span style="font-size: 0.68rem; background: #111827; color: #FCD34D; padding: 2px 5px; border-radius: 4px; margin-left: 2px;">
                             {{ strtoupper(auth()->user()->role ?? 'KASIR') }}
                         </span>
                     </div>
@@ -313,7 +331,7 @@
 
                 <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
                     @csrf
-                    <button type="submit" style="background: #FEE2E2; color: #DC2626; border: 1px solid #FCA5A5; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px;" title="Logout Kasir">
+                    <button type="submit" style="background: #FEE2E2; color: #DC2626; border: 1px solid #FCA5A5; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="Logout Kasir">
                         <i class="fa-solid fa-right-from-bracket"></i>
                         <span>Logout</span>
                     </button>
