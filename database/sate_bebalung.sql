@@ -48,11 +48,8 @@ CREATE TABLE `categories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `categories` (`id`, `name`, `slug`, `icon`, `sort_order`, `created_at`, `updated_at`) VALUES
-(1, 'Paket Murah', 'paket-murah', 'fa-fire-flame-curved', 1, NOW(), NOW()),
-(2, 'Sate Khas', 'sate', 'fa-utensils', 2, NOW(), NOW()),
-(3, 'Olahan Kuah', 'olahan-kuah', 'fa-bowl-food', 3, NOW(), NOW()),
-(4, 'Minuman Segar', 'minuman', 'fa-glass-water', 4, NOW(), NOW()),
-(5, 'Pelengkap & Nasi', 'pelengkap', 'fa-bowl-rice', 5, NOW(), NOW());
+(1, 'MENU MAKANAN', 'makanan', 'fa-utensils', 1, NOW(), NOW()),
+(2, 'MENU MINUMAN', 'minuman', 'fa-mug-hot', 2, NOW(), NOW());
 
 -- --------------------------------------------------------
 -- Table: menus

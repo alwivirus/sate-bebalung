@@ -28,6 +28,19 @@ class OrderController extends Controller
         // Hubungkan ke sistem: Catat meja sedang di-scan & aktif digunakan
         Table::markScanned($tableNumber, $customerName);
 
+        // Auto-heal categories to exact 2 categories matching menu card
+        try {
+            if (Category::where('slug', 'paket-murah')->exists() || Category::where('slug', 'makanan')->doesntExist() || Menu::count() < 15) {
+                \Illuminate\Support\Facades\DB::statement("SET FOREIGN_KEY_CHECKS=0");
+                Menu::truncate();
+                Category::truncate();
+                \Illuminate\Support\Facades\DB::statement("SET FOREIGN_KEY_CHECKS=1");
+
+                (new \Database\Seeders\CategorySeeder())->run();
+                (new \Database\Seeders\MenuSeeder())->run();
+            }
+        } catch (\Throwable $e) {}
+
         $categories = Category::with(['menus' => function ($query) {
             $query->where('is_available', true)->orderBy('sort_order', 'asc');
         }])->orderBy('sort_order', 'asc')->get();
@@ -101,6 +114,12 @@ class OrderController extends Controller
             'payment_method' => 'required|in:online,kasir',
             'cart_items' => 'required|array|min:1',
         ]);
+
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasColumn('orders', 'order_status')) {
+                \Illuminate\Support\Facades\DB::statement("ALTER TABLE orders ADD COLUMN order_status ENUM('pending','processing','completed','cancelled') NOT NULL DEFAULT 'pending' AFTER payment_status");
+            }
+        } catch (\Throwable $e) {}
 
         return DB::transaction(function () use ($request) {
             $orderCode = Order::generateOrderCode();

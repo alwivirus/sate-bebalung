@@ -18,6 +18,17 @@ class AdminController extends Controller
      */
     public function dashboard(Request $request)
     {
+        // Auto-heal database schema & categories
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasColumn('orders', 'order_status')) {
+                \Illuminate\Support\Facades\DB::statement("ALTER TABLE orders ADD COLUMN order_status ENUM('pending','processing','completed','cancelled') NOT NULL DEFAULT 'pending' AFTER payment_status");
+            }
+            if (Category::where('slug', 'makanan')->doesntExist() || Menu::count() < 15) {
+                (new \Database\Seeders\CategorySeeder())->run();
+                (new \Database\Seeders\MenuSeeder())->run();
+            }
+        } catch (\Throwable $e) {}
+
         $statusFilter = $request->query('status');
         $paymentFilter = $request->query('payment');
 

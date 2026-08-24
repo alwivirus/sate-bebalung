@@ -369,47 +369,28 @@
                 <span>{{ $category->name }}</span>
             </div>
 
-            @if($category->slug === 'makanan')
-                <!-- Single Column Makanan List -->
+            <div class="drinks-grid">
                 @foreach($category->menus as $menu)
-                    <div class="food-card" data-id="{{ $menu->id }}" data-price="{{ $menu->price }}" data-name="{{ $menu->name }}">
-                        <div class="food-info-wrapper">
-                            <div class="food-thumb">
-                                <img src="{{ $menu->image_url }}" alt="{{ $menu->name }}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
-                            </div>
-                            <div class="food-text">
-                                <h3>{{ $menu->name }}</h3>
-                                <div class="price">{{ $menu->formatted_price }}</div>
-                            </div>
+                    <div class="drink-card" data-id="{{ $menu->id }}" data-price="{{ $menu->price }}" data-name="{{ $menu->name }}">
+                        <div class="drink-thumb">
+                            <img src="{{ $menu->image_url }}" alt="{{ $menu->name }}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
+                        <h3>{{ $menu->name }}</h3>
+                        @if($menu->description)
+                            <p style="font-size: 0.7rem; color: #4B5563; font-weight: 600; line-height: 1.2; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                {{ $menu->description }}
+                            </p>
+                        @endif
+                        <div class="price">{{ $menu->formatted_price }}</div>
 
-                        <div class="food-action" id="action-{{ $menu->id }}">
-                            <div class="qty-btn-box" onclick="addToCart({{ $menu->id }}, '{{ $menu->name }}', {{ $menu->price }})">
+                        <div class="drink-action" id="action-{{ $menu->id }}" style="width: 100%;">
+                            <div class="drink-qty-btn-box" onclick="addToCart({{ $menu->id }}, '{{ $menu->name }}', {{ $menu->price }})">
                                 <i class="fa-solid fa-plus"></i>
                             </div>
                         </div>
                     </div>
                 @endforeach
-            @else
-                <!-- 2-Column Minuman Grid -->
-                <div class="drinks-grid">
-                    @foreach($category->menus as $menu)
-                        <div class="drink-card" data-id="{{ $menu->id }}" data-price="{{ $menu->price }}" data-name="{{ $menu->name }}">
-                            <div class="drink-thumb">
-                                <img src="{{ $menu->image_url }}" alt="{{ $menu->name }}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
-                            </div>
-                            <h3>{{ $menu->name }}</h3>
-                            <div class="price">{{ $menu->formatted_price }}</div>
-
-                            <div class="drink-action" id="action-{{ $menu->id }}" style="width: 100%;">
-                                <div class="drink-qty-btn-box" onclick="addToCart({{ $menu->id }}, '{{ $menu->name }}', {{ $menu->price }})">
-                                    <i class="fa-solid fa-plus"></i>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
+            </div>
         </div>
     @endforeach
 </div>
