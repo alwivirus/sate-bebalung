@@ -260,12 +260,14 @@
                     <span>Edit Profil &amp; Password</span>
                 </a>
             </li>
+            @if(auth()->user() && auth()->user()->role === 'developer')
             <li>
-                <a href="{{ route('admin.developer.index') }}" class="nav-link {{ request()->routeIs('admin.developer.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.developer.index') }}" class="nav-link {{ request()->routeIs('admin.developer.*') ? 'active' : '' }}" style="background: rgba(99, 102, 241, 0.15); border-left: 3px solid #6366F1;">
                     <i class="fa-solid fa-terminal" style="color: #6366F1;"></i>
-                    <span style="font-weight: 800;">Developer Tools</span>
+                    <span style="font-weight: 900; color: #818CF8;">Developer Console</span>
                 </a>
             </li>
+            @endif
             <li>
                 <a href="{{ route('customer.menu') }}" target="_blank" class="nav-link">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i>

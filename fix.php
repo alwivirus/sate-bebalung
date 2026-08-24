@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 
 header('Content-Type: text/html; charset=utf-8');
 
-echo "<h2>🛠️ Memperbaiki Database, Schema Orders & Items, Kategori Resmi, QRIS Resmi, Meja Bersih & Permission...</h2>";
+echo "<h2>🛠️ Memperbaiki Database, Role Akun Terpisah (Dev vs Admin Kasir), Schema, QRIS & Permission...</h2>";
 
 // 1. Database auto-fix
 try {
@@ -30,16 +30,23 @@ try {
         echo "<p style='color:green;'>✅ Kolom <b>menu_name</b> berhasil ditambahkan ke tabel order_items!</p>";
     }
 
-    // Pastikan user admin dan kasir ada dan bisa login dengan password 'admin123' / 'password'
+    // Akun 1: Master Developer (Role: developer, Password: 'dev123')
+    $devHash = password_hash('dev123', PASSWORD_BCRYPT);
+    $pdo->exec("INSERT INTO users (id, name, username, role, email, password, created_at, updated_at) 
+        VALUES (99, 'Master Developer', 'dev', 'developer', 'dev@bebarung.com', '$devHash', NOW(), NOW())
+        ON DUPLICATE KEY UPDATE password='$devHash', role='developer', name='Master Developer'");
+
+    // Akun 2: Admin Kasir Utama / Owner (Role: admin, Password: 'admin123')
     $passHash = password_hash('admin123', PASSWORD_BCRYPT);
     $pdo->exec("INSERT INTO users (id, name, username, role, email, password, created_at, updated_at) 
-        VALUES (1, 'Administrator', 'admin', 'admin', 'admin@bebarung.com', '$passHash', NOW(), NOW())
-        ON DUPLICATE KEY UPDATE password='$passHash', role='admin'");
+        VALUES (1, 'Admin Kasir Utama / Owner', 'admin', 'admin', 'admin@bebarung.com', '$passHash', NOW(), NOW())
+        ON DUPLICATE KEY UPDATE password='$passHash', role='admin', name='Admin Kasir Utama / Owner'");
 
+    // Akun 3: Kasir Reguler (Role: kasir, Password: 'password')
     $kasirHash = password_hash('password', PASSWORD_BCRYPT);
     $pdo->exec("INSERT INTO users (id, name, username, role, email, password, created_at, updated_at) 
         VALUES (2, 'Kasir 1', 'kasir', 'kasir', 'kasir@bebarung.com', '$kasirHash', NOW(), NOW())
-        ON DUPLICATE KEY UPDATE password='$kasirHash', role='kasir'");
+        ON DUPLICATE KEY UPDATE password='$kasirHash', role='kasir', name='Kasir 1'");
 
     // Reset status meja agar semua bersih & kosong (available)
     $pdo->exec("UPDATE tables SET status='available', current_customer_name=NULL, current_order_code=NULL");
@@ -82,7 +89,7 @@ try {
         $stmt->execute($m);
     }
 
-    echo "<p style='color:green;'>✅ Kolom payment_method, payment_status, order_status, menu_name, 15 Menu Resmi, QRIS Resmi & Status Meja Bersih berhasil disinkronkan 100%!</p>";
+    echo "<p style='color:green;'>✅ Role Akun Terpisah (Dev vs Admin Kasir), Kategori, 15 Menu Resmi, QRIS Resmi & Status Meja Bersih berhasil disinkronkan 100%!</p>";
 } catch (\Throwable $e) {
     echo "<p style='color:red;'>⚠️ Database Notice: " . $e->getMessage() . "</p>";
 }
@@ -107,5 +114,6 @@ copyDir(__DIR__ . '/public/images', __DIR__ . '/images');
 
 echo "<p style='color:green;'>✅ Semua logo, foto makanan & QRIS resmi berhasil dimunculkan!</p>";
 echo "<hr>";
-echo "<p><a href='/admin' style='font-size:18px;font-weight:bold;color:#111827;'>👉 Buka Dashboard Admin (Klik di Sini)</a></p>";
+echo "<p><a href='/admin' style='font-size:18px;font-weight:bold;color:#111827;'>👉 Buka Dashboard Admin Kasir (Klik di Sini)</a></p>";
+echo "<p><a href='/admin/developer' style='font-size:18px;font-weight:bold;color:#4F46E5;'>👉 Buka Panel Khusus Developer (Klik di Sini)</a></p>";
 echo "<p><a href='/?table=1' style='font-size:18px;font-weight:bold;color:#F59E0B;'>👉 Buka Tampilan Menu Pelanggan (Klik di Sini)</a></p>";

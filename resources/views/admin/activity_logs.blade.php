@@ -230,12 +230,14 @@
             <span style="font-size: 0.78rem; color: #6B7280;">Catatan lengkap tanggal, hari, jam, metode bayar, dan nominal</span>
         </div>
         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            @if(auth()->user() && auth()->user()->role === 'developer')
             <form action="{{ route('admin.developer.clear-orders') }}" method="POST" onsubmit="return confirm('PERINGATAN DEVELOPER: Hapus SEMUA riwayat transaksi testing ini? Semua meja akan kembali kosong.');" style="margin: 0;">
                 @csrf
                 <button type="submit" style="background: #FEE2E2; color: #991B1B; border: 1.5px solid #FCA5A5; border-radius: 8px; font-size: 0.75rem; font-weight: 800; padding: 6px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
                     <i class="fa-solid fa-trash-can"></i> Hapus Semua Transaksi Testing
                 </button>
             </form>
+            @endif
             <span style="font-size: 0.8rem; font-weight: 800; background: #FEF3C7; padding: 4px 10px; border-radius: 8px; color: #92400E;">
                 Total: {{ $logs->total() }} Catatan
             </span>
@@ -352,12 +354,14 @@
                                 <a href="{{ route('admin.orders.receipt', $log->order_code) }}" target="_blank" style="background: #E0E7FF; color: #3730A3; border: 1px solid #818CF8; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Cetak Struk">
                                     <i class="fa-solid fa-print"></i> Struk
                                 </a>
+                                @if(auth()->user() && auth()->user()->role === 'developer')
                                 <form action="{{ route('admin.developer.delete-order', $log->id) }}" method="POST" onsubmit="return confirm('Hapus catatan transaksi {{ $log->order_code }} ini secara permanen?');" style="margin: 0;">
                                     @csrf
-                                    <button type="submit" style="background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; padding: 5px 7px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center;" title="Hapus Catatan Ini">
+                                    <button type="submit" style="background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; padding: 5px 7px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center;" title="Hapus Catatan Ini (Khusus Developer)">
                                         <i class="fa-solid fa-trash-can"></i>
                                     </button>
                                 </form>
+                                @endif
                             </div>
                         </td>
                     </tr>

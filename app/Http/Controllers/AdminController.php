@@ -577,6 +577,10 @@ class AdminController extends Controller
      */
     public function developerIndex(Request $request)
     {
+        if (!auth()->check() || auth()->user()->role !== 'developer') {
+            return redirect()->route('admin.dashboard')->with('error', '⛔ AKSES DITOLAK: Fitur Developer & Master Tools hanya dapat diakses oleh akun Developer.');
+        }
+
         $serverInfo = [
             'php_version' => PHP_VERSION,
             'laravel_version' => app()->version(),
@@ -617,6 +621,10 @@ class AdminController extends Controller
      */
     public function developerClearOrders(Request $request)
     {
+        if (!auth()->check() || auth()->user()->role !== 'developer') {
+            return redirect()->route('admin.dashboard')->with('error', '⛔ AKSES DITOLAK: Fitur Hapus Transaksi hanya diizinkan untuk akun Developer.');
+        }
+
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         OrderItem::truncate();
         Order::truncate();
@@ -636,6 +644,10 @@ class AdminController extends Controller
      */
     public function developerDeleteOrder(Request $request, $id)
     {
+        if (!auth()->check() || auth()->user()->role !== 'developer') {
+            return redirect()->route('admin.dashboard')->with('error', '⛔ AKSES DITOLAK: Fitur Hapus Transaksi hanya diizinkan untuk akun Developer.');
+        }
+
         $order = Order::findOrFail($id);
         $orderCode = $order->order_code;
         $tableNumber = $order->table_number;
@@ -662,6 +674,10 @@ class AdminController extends Controller
      */
     public function developerSyncDb(Request $request)
     {
+        if (!auth()->check() || auth()->user()->role !== 'developer') {
+            return redirect()->route('admin.dashboard')->with('error', '⛔ AKSES DITOLAK: Hanya akun Developer yang dapat melakukan Sinkronisasi Database.');
+        }
+
         try {
             if (!Schema::hasColumn('orders', 'order_status')) {
                 DB::statement("ALTER TABLE orders ADD COLUMN order_status VARCHAR(50) NOT NULL DEFAULT 'pending' AFTER payment_status");
@@ -689,6 +705,10 @@ class AdminController extends Controller
      */
     public function developerClearCache(Request $request)
     {
+        if (!auth()->check() || auth()->user()->role !== 'developer') {
+            return redirect()->route('admin.dashboard')->with('error', '⛔ AKSES DITOLAK: Hanya akun Developer yang dapat membersihkan Cache sistem.');
+        }
+
         try {
             \Illuminate\Support\Facades\Artisan::call('cache:clear');
             \Illuminate\Support\Facades\Artisan::call('view:clear');
@@ -706,6 +726,10 @@ class AdminController extends Controller
      */
     public function developerUpdateSettings(Request $request)
     {
+        if (!auth()->check() || auth()->user()->role !== 'developer') {
+            return redirect()->route('admin.dashboard')->with('error', '⛔ AKSES DITOLAK.');
+        }
+
         if ($request->filled('resto_name')) Setting::set('resto_name', $request->input('resto_name'));
         if ($request->filled('resto_address')) Setting::set('resto_address', $request->input('resto_address'));
         if ($request->filled('resto_phone')) Setting::set('resto_phone', $request->input('resto_phone'));
