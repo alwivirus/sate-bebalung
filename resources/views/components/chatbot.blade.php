@@ -74,21 +74,21 @@
     #bebalung-chatbot-container {
         font-family: 'Plus Jakarta Sans', sans-serif;
         position: fixed;
-        z-index: 10000;
-        bottom: 24px;
-        right: 20px;
+        z-index: 9998;
+        bottom: 80px;
+        right: 16px;
     }
 
     /* Floating Action Button (FAB) */
     .chatbot-fab {
         background-color: #FFB703;
-        border: 3px solid #1E1E1E;
-        border-radius: 50px;
-        box-shadow: 4px 4px 0px #1E1E1E;
-        padding: 6px 14px 6px 6px;
+        border: 2.5px solid #1E1E1E;
+        border-radius: 40px;
+        box-shadow: 3px 3px 0px #1E1E1E;
+        padding: 4px 10px 4px 4px;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 6px;
         cursor: pointer;
         transition: transform 0.15s ease, box-shadow 0.15s ease;
         position: relative;
@@ -98,17 +98,17 @@
     .chatbot-fab:hover {
         background-color: #F59E0B;
         transform: translateY(-2px);
-        box-shadow: 5px 6px 0px #1E1E1E;
+        box-shadow: 4px 4px 0px #1E1E1E;
     }
 
     .chatbot-fab:active {
-        transform: translate(2px, 2px);
-        box-shadow: 2px 2px 0px #1E1E1E;
+        transform: translate(1px, 1px);
+        box-shadow: 1px 1px 0px #1E1E1E;
     }
 
     .fab-avatar {
-        width: 44px;
-        height: 44px;
+        width: 36px;
+        height: 36px;
         background: #FFFFFF;
         border: 2px solid #1E1E1E;
         border-radius: 50%;
@@ -129,31 +129,31 @@
 
     .online-indicator {
         position: absolute;
-        bottom: 0px;
-        right: 0px;
-        width: 12px;
-        height: 12px;
+        bottom: -1px;
+        right: -1px;
+        width: 10px;
+        height: 10px;
         background-color: #10B981;
-        border: 2px solid #1E1E1E;
+        border: 1.5px solid #1E1E1E;
         border-radius: 50%;
     }
 
     .fab-label {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 4px;
     }
 
     .fab-text {
-        font-size: 0.88rem;
+        font-size: 0.78rem;
         font-weight: 900;
         color: #111827;
         white-space: nowrap;
-        letter-spacing: 0.3px;
+        letter-spacing: 0.2px;
     }
 
     .fab-sparkle {
-        font-size: 1rem;
+        font-size: 0.85rem;
         animation: rotateSparkle 2.5s infinite linear;
     }
 
@@ -165,11 +165,11 @@
 
     .fab-pulse {
         position: absolute;
-        top: -4px;
-        left: -4px;
-        right: -4px;
-        bottom: -4px;
-        border-radius: 50px;
+        top: -3px;
+        left: -3px;
+        right: -3px;
+        bottom: -3px;
+        border-radius: 40px;
         border: 2px solid #FFB703;
         opacity: 0;
         animation: pulseEffect 2s infinite;
@@ -184,39 +184,54 @@
     /* Chatbot Modal Window */
     .chatbot-modal {
         position: fixed;
-        bottom: 84px;
-        right: 20px;
-        width: 390px;
-        max-width: calc(100vw - 32px);
-        height: 560px;
+        bottom: 80px;
+        right: 16px;
+        width: 360px;
+        max-width: calc(100vw - 28px);
+        height: 480px;
         max-height: calc(100dvh - 110px);
         background-color: #F9FAFB;
-        border: 3.5px solid #1E1E1E;
-        border-radius: 24px;
-        box-shadow: 6px 8px 0px #1E1E1E;
+        border: 2.5px solid #1E1E1E;
+        border-radius: 20px;
+        box-shadow: 4px 6px 0px #1E1E1E;
         display: none;
         flex-direction: column;
         overflow: hidden;
-        animation: modalPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        z-index: 10001;
+        animation: modalPop 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 9999;
     }
 
-    @media (max-height: 650px) {
+    @media (max-width: 480px) {
+        #bebalung-chatbot-container {
+            right: 12px;
+            bottom: 78px;
+        }
+
+        .chatbot-fab {
+            padding: 3px;
+            border-radius: 50%;
+            width: 46px;
+            height: 46px;
+            justify-content: center;
+        }
+
+        .fab-label {
+            display: none;
+        }
+
+        .fab-pulse {
+            border-radius: 50%;
+        }
+
         .chatbot-modal {
-            height: 480px;
-            max-height: calc(100dvh - 90px);
+            right: 12px;
+            left: 12px;
+            width: auto;
+            max-width: none;
             bottom: 74px;
-        }
-    }
-
-    @keyframes modalPop {
-        from {
-            opacity: 0;
-            transform: scale(0.85) translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1) translateY(0);
+            height: 440px;
+            max-height: calc(100dvh - 100px);
+            border-radius: 18px;
         }
     }
 
