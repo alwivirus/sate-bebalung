@@ -221,10 +221,8 @@
         </footer>
     </div>
 
-    <!-- Chatbot Rekomendasi Menu Pintar (Hanya tampil di awal / menu utama) -->
-    @if(request()->routeIs('customer.menu') || (request()->is('/') && !request()->routeIs('customer.checkout') && !request()->routeIs('order.*')))
-        @include('components.chatbot')
-    @endif
+    <!-- Chatbot Rekomendasi Menu Pintar (Tampil di semua meja) -->
+    @include('components.chatbot')
 
     @yield('scripts')
 </body>
