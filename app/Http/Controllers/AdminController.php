@@ -422,7 +422,7 @@ class AdminController extends Controller
                 'customer_name' => $dbTable ? $dbTable->current_customer_name : null,
                 'order_code' => $dbTable ? $dbTable->current_order_code : null,
                 'last_scanned_at' => $dbTable ? $dbTable->last_scanned_at : null,
-                'active_orders_count' => Order::where('table_number', $tableNum)->whereIn('order_status', ['pending', 'processing'])->count(),
+                'active_orders_count' => Order::whereIn('table_number', [$tableNum, (string)(int)$tableNum])->whereIn('order_status', ['pending', 'processing'])->count(),
             ];
         }
 
@@ -437,6 +437,7 @@ class AdminController extends Controller
     public function releaseTable(Request $request, $table_number)
     {
         Table::markAvailable($table_number);
+        Table::markAvailable((string)(int)$table_number);
         return redirect()->back()->with('success', "Meja #{$table_number} berhasil dikosongkan & siap untuk pelanggan berikutnya.");
     }
 
