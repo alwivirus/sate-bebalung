@@ -332,6 +332,43 @@ class AdminController extends Controller
     }
 
     /**
+     * Upload / Ambil Foto Bukti Pembayaran QRIS / Struk Fisik oleh Kasir.
+     */
+    public function uploadPaymentProof(Request $request, $id)
+    {
+        $request->validate([
+            'proof_image' => 'required|image|mimes:jpeg,png,jpg,webp|max:10240',
+        ]);
+
+        $order = Order::findOrFail($id);
+
+        if ($request->hasFile('proof_image')) {
+            $file = $request->file('proof_image');
+            $filename = 'proof_' . $order->order_code . '_' . time() . '.' . $file->getClientOriginalExtension();
+            
+            $publicDir = public_path('uploads/proofs');
+            $baseDir = base_path('uploads/proofs');
+            @mkdir($publicDir, 0755, true);
+            @mkdir($baseDir, 0755, true);
+
+            $file->move($publicDir, $filename);
+            @copy($publicDir . '/' . $filename, $baseDir . '/' . $filename);
+
+            $proofPath = 'uploads/proofs/' . $filename;
+            
+            $order->update([
+                'payment_proof' => $proofPath,
+                'payment_status' => 'paid',
+                'order_status' => $order->order_status === 'pending' ? 'processing' : $order->order_status,
+            ]);
+
+            return redirect()->back()->with('success', "Foto bukti pembayaran untuk pesanan {$order->order_code} (Meja #{$order->table_number}) berhasil disimpan ke Catatan Aktivitas!");
+        }
+
+        return redirect()->back()->with('error', 'Gagal mengunggah foto bukti pembayaran.');
+    }
+
+    /**
      * Halaman Menu Catatan Aktivitas & Riwayat Uang Masuk (Cash & QRIS).
      */
     public function activityLogs(Request $request)

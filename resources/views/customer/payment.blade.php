@@ -223,11 +223,30 @@
         <div class="bill-amount-box">{{ $order->formatted_total }}</div>
     </div>
 
+    <!-- Peringatan Verifikasi Kasir -->
+    <div style="width: 100%; max-width: 320px; background: #FEF3C7; border: 2px solid var(--dark-border); border-radius: 14px; padding: 12px 14px; margin-bottom: 16px; box-shadow: 2px 2px 0px var(--dark-border); text-align: left; display: flex; gap: 10px; align-items: flex-start;">
+        <i class="fa-solid fa-circle-exclamation" style="color: #D97706; font-size: 1.2rem; margin-top: 2px; flex-shrink: 0;"></i>
+        <div style="font-size: 0.78rem; color: #92400E; line-height: 1.35; font-weight: 700;">
+            <strong style="color: #78350F; font-size: 0.82rem; display: block; margin-bottom: 2px;">PERHATIAN PELANGGAN:</strong>
+            Setelah scan QRIS &amp; transfer berhasil, silakan <b>tunjukkan layar bukti transfer ke Kasir</b> untuk diverifikasi &amp; pesanan langsung diproses dapur.
+        </div>
+    </div>
+
+    <!-- Upload Bukti Transfer Pelanggan (Kamera / Galeri) -->
+    <form action="{{ route('order.payment.upload-proof', ['order_code' => $order->order_code]) }}" method="POST" enctype="multipart/form-data" style="width: 100%; max-width: 320px; margin-bottom: 12px;">
+        @csrf
+        <label style="width: 100%; background: #FFFFFF; border: 2px dashed #1E1E1E; border-radius: 12px; padding: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.82rem; font-weight: 800; color: #111827; cursor: pointer; box-shadow: 1.5px 1.5px 0px var(--dark-border);">
+            <i class="fa-solid fa-camera" style="color: #EA580C; font-size: 1rem;"></i>
+            <span>Unggah Foto / Screenshot Bukti Transfer</span>
+            <input type="file" name="payment_proof" accept="image/*" style="display: none;" onchange="this.form.submit()">
+        </label>
+    </form>
+
     <!-- Tombol Selesai Bayar -->
     <form action="{{ route('order.payment.confirm', ['order_code' => $order->order_code]) }}" method="POST" style="width: 100%; display: flex; justify-content: center;">
         @csrf
         <button type="submit" class="finish-pay-btn">
-            <span>SELESAI BAYAR</span>
+            <span>SAYA SUDAH BAYAR</span>
             <i class="fa-solid fa-circle-check"></i>
         </button>
     </form>

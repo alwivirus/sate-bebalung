@@ -243,6 +243,7 @@
                     <th>Detail Menu Dibeli</th>
                     <th>Metode Pembayaran</th>
                     <th>Uang Masuk (Nominal)</th>
+                    <th>Bukti Foto Kasir / QRIS</th>
                     <th>Status Database</th>
                     <th>Struk</th>
                 </tr>
@@ -306,6 +307,34 @@
                             </strong>
                         </td>
                         <td>
+                            @if($log->payment_proof)
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <a href="{{ asset($log->payment_proof) }}" target="_blank" title="Klik untuk lihat foto bukti pembayaran" style="position: relative; display: inline-block;">
+                                        <img src="{{ asset($log->payment_proof) }}" alt="Bukti {{ $log->order_code }}" style="width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 2px solid #111827; box-shadow: 2px 2px 0px #111827;">
+                                        <span style="position: absolute; bottom: 2px; right: 2px; background: #10B981; color: white; border-radius: 50%; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem;">
+                                            <i class="fa-solid fa-check"></i>
+                                        </span>
+                                    </a>
+                                    <form action="{{ route('admin.orders.upload-proof', $log->id) }}" method="POST" enctype="multipart/form-data" style="margin: 0;">
+                                        @csrf
+                                        <label style="cursor: pointer; background: #F3F4F6; border: 1px solid #D1D5DB; padding: 4px 6px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; color: #4B5563; display: inline-flex; align-items: center; gap: 3px;" title="Ganti / Foto Ulang">
+                                            <i class="fa-solid fa-camera"></i>
+                                            <input type="file" name="proof_image" accept="image/*" capture="environment" style="display: none;" onchange="this.form.submit()">
+                                        </label>
+                                    </form>
+                                </div>
+                            @else
+                                <form action="{{ route('admin.orders.upload-proof', $log->id) }}" method="POST" enctype="multipart/form-data" style="margin: 0;">
+                                    @csrf
+                                    <label style="cursor: pointer; background: #FEF3C7; border: 1.5px solid #F59E0B; padding: 5px 8px; border-radius: 8px; font-size: 0.72rem; font-weight: 800; color: #92400E; display: inline-flex; align-items: center; gap: 4px; box-shadow: 1px 1px 0px #F59E0B;" title="Ambil Foto / Upload Bukti">
+                                        <i class="fa-solid fa-camera"></i>
+                                        <span>+ Foto Bukti</span>
+                                        <input type="file" name="proof_image" accept="image/*" capture="environment" style="display: none;" onchange="this.form.submit()">
+                                    </label>
+                                </form>
+                            @endif
+                        </td>
+                        <td>
                             <span class="badge-verified">
                                 <i class="fa-solid fa-circle-check"></i> LUNAS (Tersimpan)
                             </span>
@@ -318,7 +347,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 40px; color: #9CA3AF;">
+                        <td colspan="8" style="text-align: center; padding: 40px; color: #9CA3AF;">
                             <i class="fa-solid fa-receipt" style="font-size: 2.2rem; margin-bottom: 8px; display: block; color: #D1D5DB;"></i>
                             Belum ada catatan aktivitas pembayaran pada filter yang dipilih.
                         </td>

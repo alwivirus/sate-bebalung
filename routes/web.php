@@ -31,6 +31,7 @@ Route::get('/payment', [OrderController::class, 'latestPayment'])->name('order.p
 Route::get('/pembayaran', [OrderController::class, 'latestPayment'])->name('order.pembayaran');
 Route::get('/order/{order_code}/payment', [OrderController::class, 'payment'])->name('order.payment');
 Route::post('/order/{order_code}/payment', [OrderController::class, 'confirmPayment'])->name('order.payment.confirm');
+Route::post('/order/{order_code}/upload-proof', [OrderController::class, 'uploadPaymentProof'])->name('order.payment.upload-proof');
 
 Route::get('/success', [OrderController::class, 'latestSuccess'])->name('order.success.latest');
 Route::get('/order/{order_code}/success', [OrderController::class, 'success'])->name('order.success');
@@ -45,6 +46,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/orders/search', [AdminController::class, 'searchOrder'])->name('orders.search');
     Route::post('/orders/{id}/quick-pay', [AdminController::class, 'quickPay'])->name('orders.quick-pay');
     Route::post('/orders/{id}/confirm-cash', [AdminController::class, 'confirmCashPay'])->name('orders.confirm-cash');
+    Route::post('/orders/{id}/upload-proof', [AdminController::class, 'uploadPaymentProof'])->name('orders.upload-proof');
     Route::get('/orders/{order_code}/receipt', [AdminController::class, 'receipt'])->name('orders.receipt');
 
     Route::post('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('orders.update-status');

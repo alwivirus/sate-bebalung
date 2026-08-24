@@ -246,6 +246,42 @@ class OrderController extends Controller
     }
 
     /**
+     * Upload bukti pembayaran oleh pelanggan di halaman QRIS.
+     */
+    public function uploadPaymentProof(Request $request, $order_code)
+    {
+        $request->validate([
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg,webp|max:10240',
+        ]);
+
+        $order = Order::where('order_code', $order_code)->firstOrFail();
+
+        if ($request->hasFile('payment_proof')) {
+            $file = $request->file('payment_proof');
+            $filename = 'proof_' . $order->order_code . '_' . time() . '.' . $file->getClientOriginalExtension();
+            
+            $publicDir = public_path('uploads/proofs');
+            $baseDir = base_path('uploads/proofs');
+            @mkdir($publicDir, 0755, true);
+            @mkdir($baseDir, 0755, true);
+
+            $file->move($publicDir, $filename);
+            @copy($publicDir . '/' . $filename, $baseDir . '/' . $filename);
+
+            $order->update([
+                'payment_proof' => 'uploads/proofs/' . $filename,
+                'payment_status' => 'paid',
+                'order_status' => 'processing',
+            ]);
+
+            return redirect()->route('order.success', ['order_code' => $order->order_code])
+                ->with('success', 'Foto bukti pembayaran berhasil diunggah! Pesanan Anda langsung diproses.');
+        }
+
+        return redirect()->back()->with('error', 'Gagal mengunggah foto bukti pembayaran.');
+    }
+
+    /**
      * Halaman Pesanan Siap & Barcode Kasir (Screenshot 3, Screen 3).
      */
     public function success($order_code)

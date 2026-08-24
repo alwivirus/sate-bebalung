@@ -221,8 +221,10 @@
         </footer>
     </div>
 
-    <!-- Chatbot Rekomendasi Menu Pintar (Tampil di semua meja) -->
-    @include('components.chatbot')
+    <!-- Chatbot Rekomendasi Menu Pintar (HANYA tampil di halaman menu utama saat memilih makanan, TIDAK tampil di checkout, pembayaran QRIS, ataupun struk sukses) -->
+    @if(request()->routeIs('customer.menu') || request()->is('/') || (request()->path() === '/'))
+        @include('components.chatbot')
+    @endif
 
     @yield('scripts')
 </body>

@@ -286,42 +286,61 @@
                 <div class="radio-circle"></div>
             </div>
 
-            <!-- Form Meja & Catatan -->
+            <!-- Form Meja & Identitas Pelanggan (Desain Rapi, Responsif & Tanpa Tabrakan) -->
             <div style="background: white; border: 3px solid var(--dark-border); border-radius: 16px; padding: 16px; margin-top: 16px; box-shadow: var(--box-shadow-brutal);">
-                <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-                    <div style="width: 105px;">
-                        <label style="font-size: 0.75rem; font-weight: 900; color: #111827; display: flex; align-items: center; gap: 4px; margin-bottom: 5px;">
-                            <i class="fa-solid fa-qrcode" style="color: #F59E0B;"></i> MEJA
-                        </label>
-                        <div style="background: #FEF3C7; border: 2.5px solid var(--dark-border); border-radius: 10px; padding: 8px 10px; font-weight: 900; font-size: 1rem; color: #111827; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 1.5px 1.5px 0px var(--dark-border);">
-                            <span>#{{ $tableNumber }}</span>
-                            <i class="fa-solid fa-circle-check" style="color: #059669; font-size: 0.8rem;" title="Meja Terverifikasi Hasil Scan QR"></i>
+                
+                <!-- Info Meja Bar -->
+                <div style="background: #FEF3C7; border: 2px solid var(--dark-border); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; box-shadow: 2px 2px 0px var(--dark-border);">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-chair" style="color: #EA580C; font-size: 1.1rem;"></i>
+                        <div>
+                            <div style="font-size: 0.68rem; font-weight: 800; color: #92400E; text-transform: uppercase;">Nomor Meja Makan</div>
+                            <div style="font-size: 1.1rem; font-weight: 900; color: #111827; line-height: 1;">MEJA #{{ $tableNumber }}</div>
                         </div>
-                        <input type="hidden" name="table_number" value="{{ $tableNumber }}">
                     </div>
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.75rem; font-weight: 900; color: #111827; display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
-                            <span><i class="fa-solid fa-user" style="color: #4B5563;"></i> NAMA PEMESAN</span>
-                            <span style="color: #DC2626; font-size: 0.7rem; font-weight: 800;">* WAJIB DIISI</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            name="customer_name" 
-                            id="customerNameInput"
-                            value="{{ $customerName !== 'Pelanggan' ? $customerName : '' }}" 
-                            style="width: 100%; padding: 9px 12px; border: 2.5px solid var(--dark-border); border-radius: 10px; font-weight: 800; font-size: 0.95rem; background: #FFFDF7;" 
-                            placeholder="Ketik nama Anda (cth: Budi / Ani)..." 
-                            required 
-                            minlength="2"
-                            autocomplete="name"
-                        >
+                    <div style="background: #D1FAE5; border: 1px solid #10B981; color: #065F46; font-size: 0.72rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px;">
+                        <i class="fa-solid fa-circle-check" style="color: #10B981;"></i>
+                        <span>Terhubung</span>
                     </div>
                 </div>
+                <input type="hidden" name="table_number" value="{{ $tableNumber }}">
+
+                <!-- Input Nama Pemesan (Lebar Penuh, Rapi & Jelas) -->
+                <div style="margin-bottom: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label for="customerNameInput" style="font-size: 0.8rem; font-weight: 900; color: #111827; display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-user-pen" style="color: #F59E0B;"></i> NAMA PEMESAN / TAMU
+                        </label>
+                        <span style="background: #FEE2E2; color: #DC2626; border: 1px solid #F87171; font-size: 0.65rem; font-weight: 900; padding: 2px 6px; border-radius: 4px;">WAJIB</span>
+                    </div>
+                    <input 
+                        type="text" 
+                        name="customer_name" 
+                        id="customerNameInput"
+                        value="{{ ($customerName && $customerName !== 'Pelanggan' && $customerName !== 'Pelanggan (Scan HP)') ? $customerName : '' }}" 
+                        style="width: 100%; padding: 10px 12px; border: 2.5px solid var(--dark-border); border-radius: 10px; font-weight: 800; font-size: 0.95rem; background: #FFFDF7; color: #111827; box-shadow: 1.5px 1.5px 0px var(--dark-border);" 
+                        placeholder="Ketik nama panggilan Anda (cth: Mas Budi)..." 
+                        required 
+                        minlength="2"
+                        autocomplete="name"
+                    >
+                    <div style="font-size: 0.7rem; color: #6B7280; margin-top: 4px; font-weight: 600;">
+                        Nama ini akan dicetak pada nota dan dipanggil oleh kasir / pramusaji
+                    </div>
+                </div>
+
+                <!-- Input Catatan Pesanan -->
                 <div>
-                    <label style="font-size: 0.75rem; font-weight: 800; color: #4B5563; display: block; margin-bottom: 5px;">
-                        <i class="fa-solid fa-pen-to-square"></i> CATATAN PESANAN (OPSIONAL)
+                    <label for="orderNotesInput" style="font-size: 0.78rem; font-weight: 800; color: #374151; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                        <i class="fa-solid fa-comment-dots" style="color: #6B7280;"></i> CATATAN PESANAN (OPSIONAL)
                     </label>
-                    <input type="text" name="notes" style="width: 100%; padding: 8px 12px; border: 2px solid var(--dark-border); border-radius: 8px; font-size: 0.85rem;" placeholder="Misal: Sate tidak pedas, kuah gulai dipisah...">
+                    <input 
+                        type="text" 
+                        name="notes" 
+                        id="orderNotesInput"
+                        style="width: 100%; padding: 9px 12px; border: 2px solid var(--dark-border); border-radius: 10px; font-size: 0.85rem; font-weight: 700; background: #F9FAFB;" 
+                        placeholder="Misal: Sate tidak pedas, kuah gulai dipisah..."
+                    >
                 </div>
             </div>
 

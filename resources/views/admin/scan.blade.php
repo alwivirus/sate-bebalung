@@ -461,6 +461,49 @@
                             <span class="total-val-highlight">{{ $selectedOrder->formatted_total }}</span>
                         </div>
 
+                        <!-- Foto Bukti Pembayaran Kasir / QRIS -->
+                        <div style="background: #F9FAFB; border: 2px solid #E5E7EB; border-radius: 12px; padding: 14px; margin-top: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <strong style="font-size: 0.85rem; color: #111827; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fa-solid fa-camera" style="color: #EA580C;"></i> Foto Bukti Pembayaran (Kasir / QRIS)
+                                </strong>
+                                @if($selectedOrder->payment_proof)
+                                    <span style="font-size: 0.72rem; color: #065F46; background: #D1FAE5; padding: 2px 6px; border-radius: 4px; font-weight: 800;">
+                                        <i class="fa-solid fa-circle-check"></i> Foto Tersimpan
+                                    </span>
+                                @endif
+                            </div>
+
+                            @if($selectedOrder->payment_proof)
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <a href="{{ asset($selectedOrder->payment_proof) }}" target="_blank" title="Klik untuk memperbesar">
+                                        <img src="{{ asset($selectedOrder->payment_proof) }}" alt="Bukti {{ $selectedOrder->order_code }}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 2px solid #111827; box-shadow: 2px 2px 0px #111827;">
+                                    </a>
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 0.78rem; color: #374151; font-weight: 700;">Foto bukti transfer / struk fisik</div>
+                                        <form action="{{ route('admin.orders.upload-proof', $selectedOrder->id) }}" method="POST" enctype="multipart/form-data" style="margin-top: 4px;">
+                                            @csrf
+                                            <label style="cursor: pointer; background: #E5E7EB; color: #374151; padding: 4px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+                                                <i class="fa-solid fa-camera-rotate"></i> Ganti / Foto Ulang
+                                                <input type="file" name="proof_image" accept="image/*" capture="environment" style="display: none;" onchange="this.form.submit()">
+                                            </label>
+                                        </form>
+                                    </div>
+                                </div>
+                            @else
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                                    <span style="font-size: 0.78rem; color: #6B7280;">Belum ada foto bukti pembayaran untuk pesanan ini.</span>
+                                    <form action="{{ route('admin.orders.upload-proof', $selectedOrder->id) }}" method="POST" enctype="multipart/form-data" style="margin: 0;">
+                                        @csrf
+                                        <label style="cursor: pointer; background: #EA580C; color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 2px 2px 0px #111827;">
+                                            <i class="fa-solid fa-camera"></i> Foto Bukti
+                                            <input type="file" name="proof_image" accept="image/*" capture="environment" style="display: none;" onchange="this.form.submit()">
+                                        </label>
+                                    </form>
+                                </div>
+                            @endif
+                        </div>
+
                         <!-- Action Buttons -->
                         <div class="actions-row">
                             @if($selectedOrder->payment_status === 'unpaid')
