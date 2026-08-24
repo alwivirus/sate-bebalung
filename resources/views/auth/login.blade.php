@@ -312,24 +312,9 @@
 
         <button type="submit" class="btn-login">
             <i class="fa-solid fa-right-to-bracket"></i>
-            <span>MASUK KE PANEL KASIR / DEV</span>
+            <span>MASUK KE PANEL KASIR</span>
         </button>
     </form>
-
-    <!-- Info Akun Login -->
-    <div style="background: #F8FAFC; border: 1.5px dashed #CBD5E1; border-radius: 12px; padding: 12px 14px; margin-top: 18px; font-size: 0.78rem; color: #334155; text-align: left;">
-        <div style="font-weight: 900; margin-bottom: 6px; color: #0F172A; display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-key" style="color: #6366F1;"></i> Akun Login Terdaftar:
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #E2E8F0;">
-            <span><i class="fa-solid fa-user-shield" style="color: #EA580C;"></i> Admin Kasir Utama / Owner:</span>
-            <span style="font-family: monospace; background: #FEF3C7; color: #92400E; padding: 2px 6px; border-radius: 4px; font-weight: 800;">admin / admin123</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0;">
-            <span><i class="fa-solid fa-terminal" style="color: #6366F1;"></i> Master Developer:</span>
-            <span style="font-family: monospace; background: #EEF2FF; color: #4338CA; padding: 2px 6px; border-radius: 4px; font-weight: 800;">dev / dev123</span>
-        </div>
-    </div>
 
     <div class="footer-note">
         <i class="fa-solid fa-shield-halved"></i> Dilindungi Enkripsi Sesi Aman &bull; Depot Sate Be Ba Lung
