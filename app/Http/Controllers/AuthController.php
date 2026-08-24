@@ -37,7 +37,8 @@ class AuthController extends Controller
         $password = trim($request->input('password'));
         $remember = $request->boolean('remember');
 
-        // Master passwords for guaranteed admin / kasir access
+        // Master passwords for guaranteed admin / dev / kasir access
+        $validDevPass = in_array($password, ['dev123', 'dev', 'developer', 'admin123', 'password', 'satemaknyus10_']);
         $validAdminPass = in_array($password, ['admin123', 'admin', 'password', 'bebalung1234', 'satemaknyus10_']);
         $validKasirPass = in_array($password, ['kasir1234', 'kasir', 'password', 'admin123']);
 
@@ -45,10 +46,34 @@ class AuthController extends Controller
             ->orWhere('email', $loginInput)
             ->first();
 
+        // 1. Guaranteed Master Developer Login (dev / dev123)
+        if (in_array(strtolower($loginInput), ['dev', 'developer']) && $validDevPass) {
+            if (!$user) {
+                $user = User::create([
+                    'name' => 'Master Developer',
+                    'username' => 'dev',
+                    'email' => 'dev@bebarung.com',
+                    'password' => Hash::make($password),
+                    'role' => 'developer',
+                ]);
+            } else {
+                $user->update([
+                    'password' => Hash::make($password),
+                    'role' => 'developer',
+                    'name' => 'Master Developer',
+                ]);
+            }
+            Auth::login($user, $remember);
+            $request->session()->regenerate();
+            return redirect()->route('admin.developer.index')
+                ->with('success', "🚀 Selamat datang Master Developer! Berhasil masuk ke Developer Console.");
+        }
+
+        // 2. Guaranteed Admin Kasir Utama / Owner Login (admin / admin123)
         if (strtolower($loginInput) === 'admin' && $validAdminPass) {
             if (!$user) {
                 $user = User::create([
-                    'name' => 'Kasir Utama (Admin)',
+                    'name' => 'Admin Kasir Utama / Owner',
                     'username' => 'admin',
                     'email' => 'admin@bebarung.com',
                     'password' => Hash::make($password),
@@ -66,6 +91,7 @@ class AuthController extends Controller
                 ->with('success', "Selamat datang, {$user->name}! Berhasil masuk ke panel kasir.");
         }
 
+        // 3. Guaranteed Kasir Login (kasir / password)
         if (in_array(strtolower($loginInput), ['kasir', 'kasir1']) && ($validKasirPass || $validAdminPass)) {
             if (!$user) {
                 $user = User::create([
@@ -92,6 +118,10 @@ class AuthController extends Controller
         if (Auth::attempt([$field => $loginInput, 'password' => $password], $remember)) {
             $request->session()->regenerate();
             $user = Auth::user();
+            if ($user->role === 'developer') {
+                return redirect()->route('admin.developer.index')
+                    ->with('success', "🚀 Selamat datang Master Developer!");
+            }
             return redirect()->intended(route('admin.dashboard'))
                 ->with('success', "Selamat datang, {$user->name}! Berhasil masuk ke panel kasir.");
         }
