@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 
 header('Content-Type: text/html; charset=utf-8');
 
-echo "<h2>🛠️ Memperbaiki Database, Kategori Resmi, Akun Admin, Gambar & Permission...</h2>";
+echo "<h2>🛠️ Memperbaiki Database, Kategori Resmi, QRIS Resmi, Meja Bersih & Permission...</h2>";
 
 $basePath = dirname(__DIR__);
 
@@ -30,6 +30,14 @@ try {
     $pdo->exec("INSERT INTO users (id, name, username, role, email, password, created_at, updated_at) 
         VALUES (2, 'Kasir 1', 'kasir', 'kasir', 'kasir@bebarung.com', '$kasirHash', NOW(), NOW())
         ON DUPLICATE KEY UPDATE password='$kasirHash', role='kasir'");
+
+    // Reset status meja agar semua bersih & kosong (available)
+    $pdo->exec("UPDATE tables SET status='available', current_customer_name=NULL, current_order_code=NULL");
+
+    // Set QRIS Resmi Toko
+    $pdo->exec("INSERT INTO settings (`key`, `value`, created_at, updated_at) 
+        VALUES ('qris_image', 'images/qris_official.png', NOW(), NOW())
+        ON DUPLICATE KEY UPDATE `value`='images/qris_official.png'");
 
     // Reset & Clean Categories & Menus strictly according to physical menu card
     $pdo->exec("SET FOREIGN_KEY_CHECKS=0");
@@ -64,7 +72,7 @@ try {
         $stmt->execute($m);
     }
 
-    echo "<p style='color:green;'>✅ Kategori (MENU MAKANAN & MENU MINUMAN) & 15 Menu Resmi berhasil disinkronkan 100%!</p>";
+    echo "<p style='color:green;'>✅ Kategori, 15 Menu Resmi, QRIS Resmi & Status Meja Bersih berhasil disinkronkan 100%!</p>";
 } catch (\Throwable $e) {
     echo "<p style='color:red;'>⚠️ Database Notice: " . $e->getMessage() . "</p>";
 }
@@ -87,7 +95,7 @@ function copyDir($src, $dst) {
 copyDir($basePath . '/public/images', $basePath . '/images');
 @copyDir($basePath . '/public/uploads', $basePath . '/uploads');
 
-echo "<p style='color:green;'>✅ Semua logo & foto makanan berhasil dimunculkan!</p>";
+echo "<p style='color:green;'>✅ Semua logo, foto makanan & QRIS resmi berhasil dimunculkan!</p>";
 echo "<hr>";
 echo "<p><a href='/admin' style='font-size:18px;font-weight:bold;color:#111827;'>👉 Buka Dashboard Admin (Klik di Sini)</a></p>";
 echo "<p><a href='/?table=1' style='font-size:18px;font-weight:bold;color:#F59E0B;'>👉 Buka Tampilan Menu Pelanggan (Klik di Sini)</a></p>";

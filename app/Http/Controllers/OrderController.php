@@ -25,9 +25,6 @@ class OrderController extends Controller
             session(['customer_name' => $customerName]);
         }
 
-        // Hubungkan ke sistem: Catat meja sedang di-scan & aktif digunakan
-        Table::markScanned($tableNumber, $customerName);
-
         // Auto-heal categories to exact 2 categories matching menu card
         try {
             if (Category::where('slug', 'paket-murah')->exists() || Category::count() < 2 || Menu::count() < 15) {

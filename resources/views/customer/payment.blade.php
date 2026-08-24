@@ -201,11 +201,13 @@
 
         <!-- Generated or Custom Uploaded QR Code Image -->
         <div class="qris-qr-box">
-            @if($customQrisImage && file_exists(public_path($customQrisImage)))
-                <img src="{{ asset($customQrisImage) }}" alt="QRIS {{ $customMerchant }}">
-            @else
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=QRIS_DEPOT_BEBALUNG_{{ $order->order_code }}_TOTAL_{{ $order->total_amount }}" alt="QRIS Code">
-            @endif
+            @php
+                $qrisPath = 'images/qris_official.png';
+                if ($customQrisImage && (file_exists(public_path($customQrisImage)) || file_exists(base_path($customQrisImage)))) {
+                    $qrisPath = $customQrisImage;
+                }
+            @endphp
+            <img src="{{ asset($qrisPath) }}" alt="QRIS {{ $customMerchant }}" style="width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated;">
         </div>
 
         <div class="qris-footer-banner">

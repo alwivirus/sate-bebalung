@@ -350,7 +350,7 @@
     </div>
     <div style="font-size: 0.72rem; color: #065F46; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; background: #D1FAE5; padding: 4px 8px; border-radius: 6px; border: 1px solid #10B981;">
         <span style="width: 7px; height: 7px; background: #10B981; border-radius: 50%; display: inline-block; box-shadow: 0 0 6px #10B981;"></span>
-        <span>Terhubung ke Kasir (Sedang Dipakai)</span>
+        <span>Sistem Kasir Aktif &bull; Meja #{{ $tableNumber }}</span>
     </div>
 </div>
 
