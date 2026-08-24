@@ -191,8 +191,8 @@
 
     /* Plus / Quantity Buttons */
     .qty-btn-box {
-        width: 44px;
-        height: 44px;
+        width: 100%;
+        height: 38px;
         background: #FFFFFF;
         border: 2.5px solid var(--dark-border);
         border-radius: 10px;
@@ -200,10 +200,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         font-weight: 900;
         cursor: pointer;
-        transition: transform 0.1s;
+        transition: transform 0.1s, box-shadow 0.1s;
     }
 
     .qty-btn-box:active {
@@ -213,49 +213,66 @@
 
     .drink-qty-btn-box {
         width: 100%;
-        height: 32px;
+        height: 38px;
         background: #FFFFFF;
         border: 2.5px solid var(--dark-border);
-        border-radius: 8px;
+        border-radius: 10px;
         box-shadow: 2px 2px 0px var(--dark-border);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1rem;
+        font-size: 1.1rem;
         font-weight: 900;
         cursor: pointer;
+        transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .drink-qty-btn-box:active {
+        transform: translate(2px, 2px);
+        box-shadow: 0px 0px 0px var(--dark-border);
     }
 
     .qty-stepper {
         display: flex;
         align-items: center;
-        gap: 6px;
-        background: white;
+        justify-content: space-between;
+        width: 100%;
+        height: 38px;
+        background: #FFFFFF;
         border: 2.5px solid var(--dark-border);
         border-radius: 10px;
-        padding: 4px;
+        padding: 3px 6px;
         box-shadow: 2px 2px 0px var(--dark-border);
+        box-sizing: border-box;
     }
 
     .qty-stepper button {
-        width: 28px;
+        width: 32px;
         height: 28px;
         background: var(--primary-yellow);
         border: 2px solid var(--dark-border);
         border-radius: 6px;
         font-weight: 900;
-        font-size: 0.9rem;
+        font-size: 1.1rem;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
+        color: var(--text-dark);
+        flex-shrink: 0;
+        transition: transform 0.1s;
+    }
+
+    .qty-stepper button:active {
+        transform: scale(0.9);
     }
 
     .qty-stepper span {
-        font-weight: 800;
-        min-width: 20px;
+        font-weight: 900;
+        font-size: 1rem;
+        color: #111827;
+        flex: 1;
         text-align: center;
-        font-size: 0.9rem;
     }
 
     /* Sticky Bottom Floating Cart Bar */

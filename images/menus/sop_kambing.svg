@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+    <rect width="200" height="200" rx="16" fill="#FDFBF7"/>
+    <g transform="translate(60, 8)">
+        <text x="40" y="10" font-family="'Plus Jakarta Sans', sans-serif" font-weight="900" font-size="7" fill="#111827" text-anchor="middle">DEPOT Sate</text>
+        <text x="40" y="16" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="5" fill="#D97706" text-anchor="middle">Sop &amp; Gulai Kambing</text>
+        <text x="40" y="22" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="5.5" fill="#EA580C" text-anchor="middle">"BE BA LUNG"</text>
+    </g>
+    <!-- White Soup Bowl -->
+    <ellipse cx="100" cy="115" rx="72" ry="55" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="2.5"/>
+    <ellipse cx="100" cy="105" rx="65" ry="42" fill="#E0F2FE"/>
+    <!-- Clear Rich Herb Broth -->
+    <ellipse cx="100" cy="105" rx="60" ry="38" fill="#BAE6FD" opacity="0.6"/>
+    <!-- Soft Tender Mutton / Ribs -->
+    <circle cx="85" cy="102" r="11" fill="#4B5563"/>
+    <circle cx="110" cy="106" r="12" fill="#374151"/>
+    <!-- Carrots / Tomatos / Celery (Seledri / Daun Bawang) -->
+    <circle cx="95" cy="94" r="7" fill="#EA580C"/>
+    <circle cx="120" cy="98" r="5" fill="#EF4444"/>
+    <circle cx="75" cy="108" r="3.5" fill="#22C55E"/>
+    <circle cx="102" cy="118" r="3" fill="#16A34A"/>
+    <circle cx="118" cy="114" r="3" fill="#22C55E"/>
+    <!-- Fried Shallots Sprinkles -->
+    <circle cx="90" cy="106" r="1.5" fill="#CA8A04"/>
+    <circle cx="104" cy="100" r="1.5" fill="#CA8A04"/>
+</svg>

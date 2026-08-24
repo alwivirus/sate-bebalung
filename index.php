@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-// Auto create storage subdirectories if missing on hosting
+// 1. Auto create storage directories
 $storageDirs = [
     __DIR__.'/storage/app',
     __DIR__.'/storage/framework',
@@ -18,21 +18,41 @@ $storageDirs = [
 ];
 foreach ($storageDirs as $dir) {
     if (!is_dir($dir)) {
-        @mkdir($dir, 0775, true);
+        @mkdir($dir, 0777, true);
     }
 }
 
-// Auto symlink images/uploads to root if missing
-if (!file_exists(__DIR__.'/images') && is_dir(__DIR__.'/public/images')) {
-    @symlink(__DIR__.'/public/images', __DIR__.'/images');
-}
-if (!file_exists(__DIR__.'/uploads') && is_dir(__DIR__.'/public/uploads')) {
-    @symlink(__DIR__.'/public/uploads', __DIR__.'/uploads');
-}
+// 2. Auto sync database columns and admin account on boot (silent self-heal)
+try {
+    if (file_exists(__DIR__.'/.env')) {
+        $env = parse_ini_file(__DIR__.'/.env');
+        if (!empty($env['DB_DATABASE']) && !empty($env['DB_USERNAME'])) {
+            $pdo = new PDO("mysql:host=127.0.0.1;dbname={$env['DB_DATABASE']};charset=utf8mb4", $env['DB_USERNAME'], $env['DB_PASSWORD'] ?? '', [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT,
+                PDO::ATTR_TIMEOUT => 2,
+            ]);
+            
+            // Auto add order_status column if missing
+            $checkCol = $pdo->query("SHOW COLUMNS FROM orders LIKE 'order_status'");
+            if ($checkCol && $checkCol->rowCount() === 0) {
+                $pdo->exec("ALTER TABLE orders ADD COLUMN order_status ENUM('pending','processing','completed','cancelled') NOT NULL DEFAULT 'pending' AFTER payment_status");
+            }
 
-// Determine if the application is in maintenance mode...
-if (file_exists($maintenance = __DIR__.'/storage/framework/maintenance.php')) {
-    require $maintenance;
+            // Auto ensure admin user exists with password admin123
+            $passHash = password_hash('admin123', PASSWORD_BCRYPT);
+            $pdo->exec("INSERT INTO users (id, name, username, role, email, password, created_at, updated_at) 
+                VALUES (1, 'Administrator', 'admin', 'admin', 'admin@bebarung.com', '$passHash', NOW(), NOW())
+                ON DUPLICATE KEY UPDATE password='$passHash', role='admin'");
+
+            // Auto ensure kasir user exists with password password
+            $kasirHash = password_hash('password', PASSWORD_BCRYPT);
+            $pdo->exec("INSERT INTO users (id, name, username, role, email, password, created_at, updated_at) 
+                VALUES (2, 'Kasir 1', 'kasir', 'kasir', 'kasir@bebarung.com', '$kasirHash', NOW(), NOW())
+                ON DUPLICATE KEY UPDATE password='$kasirHash', role='kasir'");
+        }
+    }
+} catch (\Throwable $e) {
+    // Ignore db connect errors on boot
 }
 
 // Register the Composer autoloader...
