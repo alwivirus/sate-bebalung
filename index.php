@@ -22,6 +22,14 @@ foreach ($storageDirs as $dir) {
     }
 }
 
+// Auto symlink images/uploads to root if missing
+if (!file_exists(__DIR__.'/images') && is_dir(__DIR__.'/public/images')) {
+    @symlink(__DIR__.'/public/images', __DIR__.'/images');
+}
+if (!file_exists(__DIR__.'/uploads') && is_dir(__DIR__.'/public/uploads')) {
+    @symlink(__DIR__.'/public/uploads', __DIR__.'/uploads');
+}
+
 // Determine if the application is in maintenance mode...
 if (file_exists($maintenance = __DIR__.'/storage/framework/maintenance.php')) {
     require $maintenance;
