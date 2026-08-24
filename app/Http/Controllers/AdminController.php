@@ -567,4 +567,147 @@ class AdminController extends Controller
 
         return redirect()->route('admin.profile')->with('success', 'Profil dan kredensial akun berhasil diperbarui! Silakan gunakan data baru untuk login berikutnya.');
     }
+
+    /**
+     * Halaman Khusus Developer & Master Tools.
+     */
+    public function developerIndex(Request $request)
+    {
+        $serverInfo = [
+            'php_version' => PHP_VERSION,
+            'laravel_version' => app()->version(),
+            'os' => PHP_OS,
+            'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Apache / cPanel PHP',
+            'db_driver' => config('database.default'),
+            'db_name' => config('database.connections.mysql.database'),
+            'storage_writable' => is_writable(storage_path()),
+            'uploads_writable' => is_writable(public_path('uploads')) || is_writable(base_path('uploads')),
+        ];
+
+        $stats = [
+            'total_orders' => Order::count(),
+            'paid_orders' => Order::where('payment_status', 'paid')->count(),
+            'unpaid_orders' => Order::where('payment_status', 'unpaid')->count(),
+            'total_revenue' => Order::where('payment_status', 'paid')->sum('total_amount'),
+            'total_menus' => Menu::count(),
+            'total_categories' => Category::count(),
+            'total_tables' => Table::count(),
+            'occupied_tables' => Table::where('status', 'occupied')->count(),
+            'users_count' => User::count(),
+        ];
+
+        $settings = [
+            'resto_name' => Setting::get('resto_name', 'DEPOT SATE & GULAI BE BA LUNG'),
+            'resto_address' => Setting::get('resto_address', 'Jl. Supriyadi No. 40 - Purwokerto'),
+            'resto_phone' => Setting::get('resto_phone', '087730712015'),
+            'qris_merchant_name' => Setting::get('qris_merchant_name', 'DEPOT SATE BE BA LUNG'),
+            'qris_nmid' => Setting::get('qris_nmid', 'ID1025428876474'),
+            'qris_image' => Setting::get('qris_image', 'images/qris_official.png'),
+        ];
+
+        return view('admin.developer', compact('serverInfo', 'stats', 'settings'));
+    }
+
+    /**
+     * Bersihkan Seluruh Data Transaksi Uji Coba (Reset Pesanan & Meja).
+     */
+    public function developerClearOrders(Request $request)
+    {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        OrderItem::truncate();
+        Order::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+
+        Table::query()->update([
+            'status' => 'available',
+            'current_customer_name' => null,
+            'current_order_code' => null,
+        ]);
+
+        return redirect()->back()->with('success', '✅ SELURUH RIWAYAT TRANSAKSI UJI COBA BERHASIL DIBERSIHKAN! Seluruh 20 meja kini kosong & omset kembali 0.');
+    }
+
+    /**
+     * Hapus 1 Pesanan Tertentu oleh Developer / Admin.
+     */
+    public function developerDeleteOrder(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+        $orderCode = $order->order_code;
+        $tableNumber = $order->table_number;
+
+        if ($order->payment_proof && (file_exists(public_path($order->payment_proof)) || file_exists(base_path($order->payment_proof)))) {
+            @unlink(public_path($order->payment_proof));
+            @unlink(base_path($order->payment_proof));
+        }
+
+        $order->items()->delete();
+        $order->delete();
+
+        $activeOrdersRemaining = Order::where('table_number', $tableNumber)->whereIn('order_status', ['pending', 'processing'])->count();
+        if ($activeOrdersRemaining === 0) {
+            Table::markAvailable($tableNumber);
+            Table::markAvailable((string)(int)$tableNumber);
+        }
+
+        return redirect()->back()->with('success', "Pesanan {$orderCode} berhasil dihapus permanen dari sistem & database.");
+    }
+
+    /**
+     * Sinkronisasi Ulang Database & Menu Resmi.
+     */
+    public function developerSyncDb(Request $request)
+    {
+        try {
+            if (!Schema::hasColumn('orders', 'order_status')) {
+                DB::statement("ALTER TABLE orders ADD COLUMN order_status VARCHAR(50) NOT NULL DEFAULT 'pending' AFTER payment_status");
+            }
+            if (!Schema::hasColumn('order_items', 'menu_name')) {
+                DB::statement("ALTER TABLE order_items ADD COLUMN menu_name VARCHAR(255) NULL AFTER menu_id");
+            }
+            DB::statement("ALTER TABLE orders MODIFY COLUMN payment_method VARCHAR(50) NOT NULL DEFAULT 'online'");
+            DB::statement("ALTER TABLE orders MODIFY COLUMN payment_status VARCHAR(50) NOT NULL DEFAULT 'unpaid'");
+            DB::statement("ALTER TABLE orders MODIFY COLUMN order_status VARCHAR(50) NOT NULL DEFAULT 'pending'");
+
+            (new \Database\Seeders\CategorySeeder())->run();
+            (new \Database\Seeders\MenuSeeder())->run();
+            (new \Database\Seeders\TableSeeder())->run();
+            (new \Database\Seeders\SettingSeeder())->run();
+
+            return redirect()->back()->with('success', '✅ Sinkronisasi Database Berhasil! Schema tabel, kolom, dan 15 Menu Resmi telah tersinkron 100%.');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'Gagal sinkronisasi: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Bersihkan Cache & Session Aplikasi.
+     */
+    public function developerClearCache(Request $request)
+    {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('cache:clear');
+            \Illuminate\Support\Facades\Artisan::call('view:clear');
+            \Illuminate\Support\Facades\Artisan::call('config:clear');
+            \Illuminate\Support\Facades\Artisan::call('route:clear');
+
+            return redirect()->back()->with('success', '✅ Cache, View Blade, Konfigurasi & Rute Laravel berhasil dibersihkan total!');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'Gagal membersihkan cache: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Simpan Pengaturan Global oleh Developer.
+     */
+    public function developerUpdateSettings(Request $request)
+    {
+        if ($request->filled('resto_name')) Setting::set('resto_name', $request->input('resto_name'));
+        if ($request->filled('resto_address')) Setting::set('resto_address', $request->input('resto_address'));
+        if ($request->filled('resto_phone')) Setting::set('resto_phone', $request->input('resto_phone'));
+        if ($request->filled('qris_merchant_name')) Setting::set('qris_merchant_name', $request->input('qris_merchant_name'));
+        if ($request->filled('qris_nmid')) Setting::set('qris_nmid', $request->input('qris_nmid'));
+
+        return redirect()->back()->with('success', 'Pengaturan sistem berhasil disimpan!');
+    }
 }

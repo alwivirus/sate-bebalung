@@ -257,7 +257,13 @@
             <li>
                 <a href="{{ route('admin.profile') }}" class="nav-link {{ request()->routeIs('admin.profile') ? 'active' : '' }}">
                     <i class="fa-solid fa-user-gear"></i>
-                    <span>Edit Profil & Password</span>
+                    <span>Edit Profil &amp; Password</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.developer.index') }}" class="nav-link {{ request()->routeIs('admin.developer.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-terminal" style="color: #6366F1;"></i>
+                    <span style="font-weight: 800;">Developer Tools</span>
                 </a>
             </li>
             <li>

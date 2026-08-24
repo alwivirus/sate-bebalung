@@ -72,4 +72,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Edit Profil Akun, Email & Ganti Password Admin/Kasir
     Route::get('/profile', [AdminController::class, 'profileIndex'])->name('profile');
     Route::post('/profile', [AdminController::class, 'updateProfile'])->name('profile.update');
+
+    // Panel Khusus Developer & Master Testing Tools
+    Route::get('/developer', [AdminController::class, 'developerIndex'])->name('developer.index');
+    Route::post('/developer/clear-orders', [AdminController::class, 'developerClearOrders'])->name('developer.clear-orders');
+    Route::post('/developer/delete-order/{id}', [AdminController::class, 'developerDeleteOrder'])->name('developer.delete-order');
+    Route::post('/developer/sync-db', [AdminController::class, 'developerSyncDb'])->name('developer.sync-db');
+    Route::post('/developer/clear-cache', [AdminController::class, 'developerClearCache'])->name('developer.clear-cache');
+    Route::post('/developer/update-settings', [AdminController::class, 'developerUpdateSettings'])->name('developer.update-settings');
 });
