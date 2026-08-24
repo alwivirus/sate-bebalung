@@ -109,18 +109,22 @@ class OrderController extends Controller
 
         try {
             if (!\Illuminate\Support\Facades\Schema::hasColumn('orders', 'order_status')) {
-                \Illuminate\Support\Facades\DB::statement("ALTER TABLE orders ADD COLUMN order_status ENUM('pending','processing','completed','cancelled') NOT NULL DEFAULT 'pending' AFTER payment_status");
+                \Illuminate\Support\Facades\DB::statement("ALTER TABLE orders ADD COLUMN order_status VARCHAR(50) NOT NULL DEFAULT 'pending' AFTER payment_status");
             }
+            \Illuminate\Support\Facades\DB::statement("ALTER TABLE orders MODIFY COLUMN payment_method VARCHAR(50) NOT NULL DEFAULT 'online'");
+            \Illuminate\Support\Facades\DB::statement("ALTER TABLE orders MODIFY COLUMN payment_status VARCHAR(50) NOT NULL DEFAULT 'unpaid'");
+            \Illuminate\Support\Facades\DB::statement("ALTER TABLE orders MODIFY COLUMN order_status VARCHAR(50) NOT NULL DEFAULT 'pending'");
         } catch (\Throwable $e) {}
 
         return DB::transaction(function () use ($request) {
             $orderCode = Order::generateOrderCode();
+            $paymentMethod = in_array($request->input('payment_method'), ['online', 'qris']) ? 'online' : 'kasir';
 
             $order = Order::create([
                 'order_code' => $orderCode,
                 'customer_name' => trim($request->input('customer_name')),
                 'table_number' => $request->input('table_number', '01'),
-                'payment_method' => $request->input('payment_method', 'online'),
+                'payment_method' => $paymentMethod,
                 'payment_status' => 'unpaid',
                 'order_status' => 'pending',
                 'total_amount' => 0,

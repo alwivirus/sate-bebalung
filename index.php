@@ -32,10 +32,14 @@ try {
                 PDO::ATTR_TIMEOUT => 2,
             ]);
             
-            // Auto add order_status column if missing
+            // Auto ensure columns are VARCHAR(50) to prevent truncation errors
+            $pdo->exec("ALTER TABLE orders MODIFY COLUMN payment_method VARCHAR(50) NOT NULL DEFAULT 'online'");
+            $pdo->exec("ALTER TABLE orders MODIFY COLUMN payment_status VARCHAR(50) NOT NULL DEFAULT 'unpaid'");
             $checkCol = $pdo->query("SHOW COLUMNS FROM orders LIKE 'order_status'");
             if ($checkCol && $checkCol->rowCount() === 0) {
-                $pdo->exec("ALTER TABLE orders ADD COLUMN order_status ENUM('pending','processing','completed','cancelled') NOT NULL DEFAULT 'pending' AFTER payment_status");
+                $pdo->exec("ALTER TABLE orders ADD COLUMN order_status VARCHAR(50) NOT NULL DEFAULT 'pending' AFTER payment_status");
+            } else {
+                $pdo->exec("ALTER TABLE orders MODIFY COLUMN order_status VARCHAR(50) NOT NULL DEFAULT 'pending'");
             }
 
             // Auto ensure admin user exists with password admin123

@@ -430,9 +430,20 @@
         return 'Rp ' + Number(number).toLocaleString('id-ID');
     }
 
+    const TABLE_NUM = "{{ $tableNumber }}";
+    const CART_STORAGE_KEY = `beba_cart_meja_${TABLE_NUM}`;
+
     function saveCart() {
         try {
-            localStorage.setItem('beba_cart', JSON.stringify(cart));
+            localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+        } catch (e) {}
+    }
+
+    function clearCart() {
+        cart = {};
+        try {
+            localStorage.removeItem(CART_STORAGE_KEY);
+            localStorage.removeItem('beba_cart');
         } catch (e) {}
     }
 
@@ -498,7 +509,7 @@
         if (totalCount > 0) {
             stickyCart.style.display = 'flex';
             cartTotalDisplay.innerText = formatRupiah(totalPrice);
-            cartItemsCount.innerText = `${totalCount} Item dipilih (Meja #{{ $tableNumber }})`;
+            cartItemsCount.innerText = `${totalCount} Item dipilih (Meja #${TABLE_NUM})`;
             cartPayload.value = JSON.stringify(cart);
         } else {
             stickyCart.style.display = 'none';
@@ -526,22 +537,14 @@
         return true;
     }
 
-    // Restore cart on page load (from localStorage or PHP session)
+    // Restore cart on page load (scoped to current table)
     document.addEventListener('DOMContentLoaded', function() {
         try {
-            const savedCart = localStorage.getItem('beba_cart');
+            const savedCart = localStorage.getItem(CART_STORAGE_KEY);
             if (savedCart) {
                 const parsed = JSON.parse(savedCart);
                 if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
                     cart = parsed;
-                }
-            }
-            
-            if (Object.keys(cart).length === 0) {
-                const sessionCart = @json(session('cart', []));
-                if (sessionCart && typeof sessionCart === 'object' && Object.keys(sessionCart).length > 0) {
-                    cart = sessionCart;
-                    saveCart();
                 }
             }
         } catch (e) {

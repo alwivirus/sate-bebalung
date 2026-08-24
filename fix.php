@@ -4,19 +4,24 @@ error_reporting(E_ALL);
 
 header('Content-Type: text/html; charset=utf-8');
 
-echo "<h2>🛠️ Memperbaiki Database, Kategori Resmi, QRIS Resmi, Meja Bersih & Permission...</h2>";
+echo "<h2>🛠️ Memperbaiki Database, Schema Orders, Kategori Resmi, QRIS Resmi, Meja Bersih & Permission...</h2>";
 
 // 1. Database auto-fix
 try {
     $pdo = new PDO('mysql:host=127.0.0.1;dbname=bebs9762_bebalung;charset=utf8mb4', 'bebs9762_bebalung', 'satemaknyus10_');
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Cek kolom order_status di orders
+    // Cek kolom order_status di orders dan ubah ke VARCHAR(50) agar tidak error truncation
     $cols = $pdo->query("SHOW COLUMNS FROM orders LIKE 'order_status'")->fetchAll();
     if (empty($cols)) {
-        $pdo->exec("ALTER TABLE orders ADD COLUMN order_status ENUM('pending','processing','completed','cancelled') NOT NULL DEFAULT 'pending' AFTER payment_status");
+        $pdo->exec("ALTER TABLE orders ADD COLUMN order_status VARCHAR(50) NOT NULL DEFAULT 'pending' AFTER payment_status");
         echo "<p style='color:green;'>✅ Kolom <b>order_status</b> berhasil ditambahkan ke tabel orders!</p>";
+    } else {
+        $pdo->exec("ALTER TABLE orders MODIFY COLUMN order_status VARCHAR(50) NOT NULL DEFAULT 'pending'");
     }
+
+    $pdo->exec("ALTER TABLE orders MODIFY COLUMN payment_method VARCHAR(50) NOT NULL DEFAULT 'online'");
+    $pdo->exec("ALTER TABLE orders MODIFY COLUMN payment_status VARCHAR(50) NOT NULL DEFAULT 'unpaid'");
 
     // Pastikan user admin dan kasir ada dan bisa login dengan password 'admin123' / 'password'
     $passHash = password_hash('admin123', PASSWORD_BCRYPT);
@@ -70,7 +75,7 @@ try {
         $stmt->execute($m);
     }
 
-    echo "<p style='color:green;'>✅ Kategori, 15 Menu Resmi, QRIS Resmi & Status Meja Bersih berhasil disinkronkan 100%!</p>";
+    echo "<p style='color:green;'>✅ Kolom payment_method, payment_status, order_status, 15 Menu Resmi, QRIS Resmi & Status Meja Bersih berhasil disinkronkan 100%!</p>";
 } catch (\Throwable $e) {
     echo "<p style='color:red;'>⚠️ Database Notice: " . $e->getMessage() . "</p>";
 }

@@ -355,6 +355,9 @@
     }
 
     const payForm = document.getElementById('paymentForm');
+    const TABLE_NUM = "{{ $tableNumber }}";
+    const CART_STORAGE_KEY = `beba_cart_meja_${TABLE_NUM}`;
+
     if (payForm) {
         payForm.addEventListener('submit', function(e) {
             const nameInput = document.getElementById('customerNameInput');
@@ -364,6 +367,10 @@
                 nameInput.focus();
                 return false;
             }
+            try {
+                localStorage.removeItem(CART_STORAGE_KEY);
+                localStorage.removeItem('beba_cart');
+            } catch (err) {}
         });
     }
 
@@ -372,7 +379,7 @@
         const hasItems = {{ !empty($items) && count($items) > 0 ? 'true' : 'false' }};
         if (!hasItems) {
             try {
-                const saved = localStorage.getItem('beba_cart');
+                const saved = localStorage.getItem(CART_STORAGE_KEY);
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
