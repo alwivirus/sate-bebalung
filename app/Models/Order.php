@@ -18,6 +18,7 @@ class Order extends Model
         'payment_status',
         'order_status',
         'total_amount',
+        'payment_proof',
         'notes',
     ];
 

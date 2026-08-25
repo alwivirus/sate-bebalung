@@ -6,8 +6,6 @@ header('Content-Type: text/html; charset=utf-8');
 
 echo "<h2>🛠️ Memperbaiki Database, Role Akun Terpisah (Dev vs Admin Kasir), Schema, QRIS & Permission...</h2>";
 
-$basePath = dirname(__DIR__);
-
 // 1. Database auto-fix
 try {
     $pdo = new PDO('mysql:host=127.0.0.1;dbname=bebs9762_bebalung;charset=utf8mb4', 'bebs9762_bebalung', 'satemaknyus10_');
@@ -24,6 +22,13 @@ try {
 
     $pdo->exec("ALTER TABLE orders MODIFY COLUMN payment_method VARCHAR(50) NOT NULL DEFAULT 'online'");
     $pdo->exec("ALTER TABLE orders MODIFY COLUMN payment_status VARCHAR(50) NOT NULL DEFAULT 'unpaid'");
+
+    // Cek kolom payment_proof di orders
+    $orderProofCols = $pdo->query("SHOW COLUMNS FROM orders LIKE 'payment_proof'")->fetchAll();
+    if (empty($orderProofCols)) {
+        $pdo->exec("ALTER TABLE orders ADD COLUMN payment_proof VARCHAR(255) NULL AFTER total_amount");
+        echo "<p style='color:green;'>✅ Kolom <b>payment_proof</b> berhasil ditambahkan ke tabel orders!</p>";
+    }
 
     // Cek kolom menu_name di order_items
     $itemCols = $pdo->query("SHOW COLUMNS FROM order_items LIKE 'menu_name'")->fetchAll();
@@ -111,8 +116,8 @@ function copyDir($src, $dst) {
     }
 }
 
-copyDir($basePath . '/public/images', $basePath . '/images');
-@copyDir($basePath . '/public/uploads', $basePath . '/uploads');
+copyDir(__DIR__ . '/public/images', __DIR__ . '/images');
+@copyDir(__DIR__ . '/public/uploads', __DIR__ . '/uploads');
 
 echo "<p style='color:green;'>✅ Semua logo, foto makanan & QRIS resmi berhasil dimunculkan!</p>";
 echo "<hr>";

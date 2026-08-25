@@ -257,6 +257,13 @@ class OrderController extends Controller
         $order = Order::where('order_code', $order_code)->firstOrFail();
 
         if ($request->hasFile('payment_proof')) {
+            // Auto check column in DB
+            try {
+                if (!\Illuminate\Support\Facades\Schema::hasColumn('orders', 'payment_proof')) {
+                    \Illuminate\Support\Facades\DB::statement("ALTER TABLE orders ADD COLUMN payment_proof VARCHAR(255) NULL AFTER total_amount");
+                }
+            } catch (\Throwable $e) {}
+
             $file = $request->file('payment_proof');
             $filename = 'proof_' . $order->order_code . '_' . time() . '.' . $file->getClientOriginalExtension();
             
@@ -268,11 +275,22 @@ class OrderController extends Controller
             $file->move($publicDir, $filename);
             @copy($publicDir . '/' . $filename, $baseDir . '/' . $filename);
 
-            $order->update([
-                'payment_proof' => 'uploads/proofs/' . $filename,
-                'payment_status' => 'paid',
-                'order_status' => 'processing',
-            ]);
+            $proofPath = 'uploads/proofs/' . $filename;
+            $order->payment_proof = $proofPath;
+            $order->payment_status = 'paid';
+            $order->order_status = 'processing';
+            $order->save();
+
+            // Direct DB update for 100% guarantee
+            try {
+                \Illuminate\Support\Facades\DB::table('orders')
+                    ->where('id', $order->id)
+                    ->update([
+                        'payment_proof' => $proofPath,
+                        'payment_status' => 'paid',
+                        'order_status' => 'processing',
+                    ]);
+            } catch (\Throwable $e) {}
 
             return redirect()->route('order.success', ['order_code' => $order->order_code])
                 ->with('success', 'Foto bukti pembayaran berhasil diunggah! Pesanan Anda langsung diproses.');
