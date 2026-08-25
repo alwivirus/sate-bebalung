@@ -184,41 +184,6 @@ class AdminController extends Controller
     }
 
     /**
-     * Upload / Ganti Foto Bukti Pembayaran oleh Kasir / Admin.
-     */
-    public function uploadPaymentProof(Request $request, $id)
-    {
-        $request->validate([
-            'proof_image' => 'required|image|mimes:jpeg,png,jpg,webp|max:10240',
-        ]);
-
-        $order = Order::findOrFail($id);
-
-        if ($request->hasFile('proof_image')) {
-            $file = $request->file('proof_image');
-            $filename = 'proof_cashier_' . $order->order_code . '_' . time() . '.' . $file->getClientOriginalExtension();
-
-            $publicDir = public_path('uploads/proofs');
-            $baseDir = base_path('uploads/proofs');
-            @mkdir($publicDir, 0755, true);
-            @mkdir($baseDir, 0755, true);
-
-            $file->move($publicDir, $filename);
-            @copy($publicDir . '/' . $filename, $baseDir . '/' . $filename);
-
-            $order->update([
-                'payment_proof' => 'uploads/proofs/' . $filename,
-                'payment_status' => 'paid',
-                'order_status' => $order->order_status === 'pending' ? 'processing' : $order->order_status,
-            ]);
-
-            return redirect()->back()->with('success', "Foto bukti pembayaran untuk pesanan #{$order->order_code} berhasil disimpan & diverifikasi!");
-        }
-
-        return redirect()->back()->with('error', 'Gagal mengunggah foto bukti pembayaran.');
-    }
-
-    /**
      * Cetak Struk Kasir (Thermal Receipt 58mm / 80mm).
      */
     public function receipt($order_code)
