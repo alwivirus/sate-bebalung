@@ -63,6 +63,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // Kelola & Cetak QR Meja Pelanggan (Meja 1, Meja 2, dst)
     Route::get('/tables', [AdminController::class, 'tablesIndex'])->name('tables.index');
+    Route::get('/tables/{table_number}/print', [AdminController::class, 'printSingleTable'])->name('tables.print-single');
     Route::post('/tables/{table_number}/release', [AdminController::class, 'releaseTable'])->name('tables.release');
 
     // Pengaturan QRIS Pembayaran Toko

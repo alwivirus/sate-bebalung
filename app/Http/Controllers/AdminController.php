@@ -473,6 +473,25 @@ class AdminController extends Controller
     }
 
     /**
+     * Cetak Khusus 1 Standee Akrilik Meja (High Definition Print Ready).
+     */
+    public function printSingleTable($table_number)
+    {
+        $tableNum = str_pad((int)$table_number, 2, '0', STR_PAD_LEFT);
+        $baseUrl = url('/');
+        $scanUrl = $baseUrl . '/?meja=' . $tableNum;
+        $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=450x450&data=' . urlencode($scanUrl) . '&margin=0';
+        
+        $table = [
+            'number' => $tableNum,
+            'scan_url' => $scanUrl,
+            'qr_image' => $qrApiUrl,
+        ];
+
+        return view('admin.tables_print_single', compact('table'));
+    }
+
+    /**
      * Kosongkan / Reset Status Meja (Setelah Pelanggan Selesai Makan).
      */
     public function releaseTable(Request $request, $table_number)

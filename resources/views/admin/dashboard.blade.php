@@ -155,28 +155,40 @@
         </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;">
         @foreach($liveTables as $t)
-            <div style="border: 1.5px solid {{ $t->status === 'occupied' ? '#F59E0B' : '#E5E7EB' }}; background: {{ $t->status === 'occupied' ? '#FFFBEB' : '#F9FAFB' }}; border-radius: 10px; padding: 8px 10px; text-align: center; position: relative;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
-                    <strong style="font-size: 0.85rem; color: #111827;">Meja #{{ $t->table_number }}</strong>
-                    <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ $t->status === 'occupied' ? '#EA580C' : '#9CA3AF' }};"></span>
+            <div style="border: 2px solid {{ $t->status === 'occupied' ? '#F59E0B' : '#E5E7EB' }}; background: {{ $t->status === 'occupied' ? '#FFFBEB' : '#FFFFFF' }}; border-radius: 12px; padding: 10px; text-align: center; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.03); transition: transform 0.15s, border-color 0.15s;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <strong style="font-size: 0.88rem; color: #111827;">Meja #{{ $t->table_number }}</strong>
+                    <span style="width: 9px; height: 9px; border-radius: 50%; background: {{ $t->status === 'occupied' ? '#EA580C' : '#10B981' }};" title="{{ $t->status === 'occupied' ? 'Sedang Digunakan' : 'Tersedia' }}"></span>
                 </div>
 
                 @if($t->status === 'occupied')
-                    <div style="font-size: 0.7rem; color: #B45309; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        <i class="fa-solid fa-mobile-screen"></i> {{ $t->current_customer_name ?: 'Sedang Pesan' }}
+                    <div style="font-size: 0.72rem; color: #B45309; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px;">
+                        <i class="fa-solid fa-user"></i> {{ $t->current_customer_name ?: 'Sedang Pesan' }}
                     </div>
-                    <form action="{{ route('admin.tables.release', $t->table_number) }}" method="POST" style="margin-top: 4px;">
+                @else
+                    <div style="font-size: 0.72rem; color: #059669; font-weight: 800; margin-bottom: 6px;">
+                        <i class="fa-solid fa-check"></i> Tersedia
+                    </div>
+                @endif
+
+                <div style="display: flex; gap: 4px; justify-content: center; margin-top: 4px;">
+                    <a href="{{ route('admin.tables.print-single', $t->table_number) }}" target="_blank" style="background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; border-radius: 6px; padding: 3px 6px; font-size: 0.7rem; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;" title="Cetak Standee Akrilik Meja #{{ $t->table_number }}">
+                        <i class="fa-solid fa-print"></i> Cetak
+                    </a>
+                    <a href="{{ url('/?meja=' . $t->table_number) }}" target="_blank" style="background: #F3F4F6; color: #374151; border: 1px solid #D1D5DB; border-radius: 6px; padding: 3px 6px; font-size: 0.7rem; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;" title="Uji Layar Pelanggan Meja #{{ $t->table_number }}">
+                        <i class="fa-solid fa-mobile-screen"></i> Uji
+                    </a>
+                </div>
+
+                @if($t->status === 'occupied')
+                    <form action="{{ route('admin.tables.release', $t->table_number) }}" method="POST" style="margin-top: 6px;">
                         @csrf
-                        <button type="submit" style="background: #FEE2E2; border: 1px solid #FCA5A5; color: #991B1B; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; cursor: pointer; width: 100%;" title="Klik jika tamu sudah selesai makan">
-                            Kosongkan
+                        <button type="submit" style="background: #FEE2E2; border: 1px solid #FCA5A5; color: #991B1B; font-size: 0.68rem; font-weight: 800; padding: 3px 6px; border-radius: 6px; cursor: pointer; width: 100%;" title="Kosongkan Meja">
+                            <i class="fa-solid fa-rotate-left"></i> Kosongkan
                         </button>
                     </form>
-                @else
-                    <div style="font-size: 0.7rem; color: #9CA3AF; font-weight: 700;">
-                        Tersedia
-                    </div>
                 @endif
             </div>
         @endforeach
