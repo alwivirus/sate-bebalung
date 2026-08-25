@@ -249,7 +249,8 @@
                     <th>Kode / Meja</th>
                     <th>Detail Item Pesanan</th>
                     <th>Total</th>
-                    <th>Metode & Status Bayar</th>
+                    <th>Metode &amp; Status Bayar</th>
+                    <th>Bukti Foto Kasir / QRIS</th>
                     <th>Status Pesanan</th>
                     <th>Aksi Kasir</th>
                 </tr>
@@ -307,11 +308,46 @@
                             <!-- Catatan Penegasan Pendapatan Tetap Terhitung -->
                             @if($order->payment_method === 'kasir')
                                 <div style="margin-top: 6px; font-size: 0.72rem; background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 6px; padding: 4px 6px; color: #92400E; font-weight: 700; line-height: 1.3;">
-                                    <i class="fa-solid fa-info-circle"></i> Pesanan ini menggunakan <strong>Cash</strong>, pendapatan tetap terhitung &amp; tersimpan di database.
+                                    <i class="fa-solid fa-info-circle"></i> Cash &bull; Tersimpan
                                 </div>
                             @else
                                 <div style="margin-top: 6px; font-size: 0.72rem; background: #ECFDF5; border: 1px solid #10B981; border-radius: 6px; padding: 4px 6px; color: #065F46; font-weight: 700; line-height: 1.3;">
-                                    <i class="fa-solid fa-circle-check"></i> Pesanan menggunakan <strong>QRIS Online</strong>, pendapatan otomatis terhitung.
+                                    <i class="fa-solid fa-circle-check"></i> QRIS &bull; Otomatis
+                                </div>
+                            @endif
+                        </td>
+                        <td>
+                            @if($order->payment_proof)
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <a href="{{ asset($order->payment_proof) }}" target="_blank" title="Klik untuk lihat foto bukti" style="position: relative; display: inline-block;">
+                                        <img src="{{ asset($order->payment_proof) }}" alt="Bukti {{ $order->order_code }}" style="width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 2px solid #111827; box-shadow: 2px 2px 0px #111827;">
+                                        <span style="position: absolute; bottom: 2px; right: 2px; background: #10B981; color: white; border-radius: 50%; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem;">
+                                            <i class="fa-solid fa-check"></i>
+                                        </span>
+                                    </a>
+                                    <form action="{{ route('admin.orders.upload-proof', $order->id) }}" method="POST" enctype="multipart/form-data" style="margin: 0;">
+                                        @csrf
+                                        <label style="cursor: pointer; background: #F3F4F6; border: 1px solid #D1D5DB; padding: 4px 6px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; color: #4B5563; display: inline-flex; align-items: center; gap: 3px;" title="Ganti / Foto Ulang">
+                                            <i class="fa-solid fa-camera"></i>
+                                            <input type="file" name="proof_image" accept="image/*" capture="environment" style="display: none;" onchange="this.form.submit()">
+                                        </label>
+                                    </form>
+                                </div>
+                            @else
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    @if($order->payment_method === 'online')
+                                        <span style="font-size: 0.68rem; color: #D97706; background: #FEF3C7; padding: 2px 6px; border-radius: 4px; font-weight: 800;">
+                                            <i class="fa-solid fa-eye"></i> Tunjukkan Kasir
+                                        </span>
+                                    @endif
+                                    <form action="{{ route('admin.orders.upload-proof', $order->id) }}" method="POST" enctype="multipart/form-data" style="margin: 0;">
+                                        @csrf
+                                        <label style="cursor: pointer; background: #FEF3C7; border: 1.5px solid #F59E0B; padding: 4px 8px; border-radius: 8px; font-size: 0.72rem; font-weight: 800; color: #92400E; display: inline-flex; align-items: center; gap: 4px; box-shadow: 1px 1px 0px #F59E0B;" title="Ambil Foto Struk / Layar HP">
+                                            <i class="fa-solid fa-camera"></i>
+                                            <span>+ Foto Bukti</span>
+                                            <input type="file" name="proof_image" accept="image/*" capture="environment" style="display: none;" onchange="this.form.submit()">
+                                        </label>
+                                    </form>
                                 </div>
                             @endif
                         </td>

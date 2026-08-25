@@ -223,30 +223,55 @@
         <div class="bill-amount-box">{{ $order->formatted_total }}</div>
     </div>
 
-    <!-- Peringatan Verifikasi Kasir -->
-    <div style="width: 100%; max-width: 320px; background: #FEF3C7; border: 2px solid var(--dark-border); border-radius: 14px; padding: 12px 14px; margin-bottom: 16px; box-shadow: 2px 2px 0px var(--dark-border); text-align: left; display: flex; gap: 10px; align-items: flex-start;">
-        <i class="fa-solid fa-circle-exclamation" style="color: #D97706; font-size: 1.2rem; margin-top: 2px; flex-shrink: 0;"></i>
-        <div style="font-size: 0.78rem; color: #92400E; line-height: 1.35; font-weight: 700;">
-            <strong style="color: #78350F; font-size: 0.82rem; display: block; margin-bottom: 2px;">PERHATIAN PELANGGAN:</strong>
-            Setelah scan QRIS &amp; transfer berhasil, silakan <b>tunjukkan layar bukti transfer ke Kasir</b> untuk diverifikasi &amp; pesanan langsung diproses dapur.
+    <!-- Opsi Bukti Pembayaran QRIS (Pilihan Pelanggan) -->
+    <div style="width: 100%; max-width: 330px; background: #FFFFFF; border: 2.5px solid var(--dark-border); border-radius: 16px; padding: 14px; margin-bottom: 18px; box-shadow: var(--box-shadow-brutal); text-align: left;">
+        <div style="font-size: 0.85rem; font-weight: 900; color: #111827; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-shield-halved" style="color: #EA580C;"></i> Verifikasi Pembayaran QRIS:
+        </div>
+
+        @if($order->payment_proof)
+            <!-- Status jika sudah upload foto -->
+            <div style="background: #ECFDF5; border: 1.5px solid #10B981; border-radius: 12px; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                <img src="{{ asset($order->payment_proof) }}" alt="Bukti Transfer" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1.5px solid #111827;">
+                <div style="flex: 1;">
+                    <div style="font-size: 0.78rem; font-weight: 900; color: #065F46;">
+                        <i class="fa-solid fa-circle-check"></i> Foto Bukti Terunggah!
+                    </div>
+                    <div style="font-size: 0.7rem; color: #047857;">Tersimpan di database kasir.</div>
+                </div>
+            </div>
+        @endif
+
+        <!-- Pilihan A: Upload Screenshot / Foto Bukti -->
+        <div style="margin-bottom: 10px;">
+            <span style="font-size: 0.72rem; font-weight: 800; color: #6B7280; text-transform: uppercase; display: block; margin-bottom: 4px;">
+                Pilihan 1: Unggah Foto / Screenshot Transfer
+            </span>
+            <form action="{{ route('order.payment.upload-proof', ['order_code' => $order->order_code]) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <label style="width: 100%; background: #F9FAFB; border: 2px dashed #9CA3AF; border-radius: 10px; padding: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; font-weight: 800; color: #111827; cursor: pointer;">
+                    <i class="fa-solid fa-cloud-arrow-up" style="color: #EA580C; font-size: 1.1rem;"></i>
+                    <span>{{ $order->payment_proof ? 'Ganti Foto Bukti Transfer' : 'Pilih File / Ambil Screenshot' }}</span>
+                    <input type="file" name="payment_proof" accept="image/*" style="display: none;" onchange="this.form.submit()">
+                </label>
+            </form>
+        </div>
+
+        <!-- Pilihan B: Tunjukkan Layar Langsung ke Kasir -->
+        <div style="background: #FEF3C7; border: 1.5px solid #FCD34D; border-radius: 10px; padding: 10px; font-size: 0.75rem; color: #92400E; font-weight: 700; line-height: 1.35;">
+            <i class="fa-solid fa-store" style="color: #D97706;"></i>
+            <strong>Pilihan 2: Tunjukkan Langsung ke Kasir</strong>
+            <div style="font-size: 0.7rem; color: #78350F; margin-top: 2px;">
+                Jika tidak ingin upload file, Anda bisa langsung menunjukkan layar HP bukti transfer berhasil ke meja kasir.
+            </div>
         </div>
     </div>
-
-    <!-- Upload Bukti Transfer Pelanggan (Kamera / Galeri) -->
-    <form action="{{ route('order.payment.upload-proof', ['order_code' => $order->order_code]) }}" method="POST" enctype="multipart/form-data" style="width: 100%; max-width: 320px; margin-bottom: 12px;">
-        @csrf
-        <label style="width: 100%; background: #FFFFFF; border: 2px dashed #1E1E1E; border-radius: 12px; padding: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.82rem; font-weight: 800; color: #111827; cursor: pointer; box-shadow: 1.5px 1.5px 0px var(--dark-border);">
-            <i class="fa-solid fa-camera" style="color: #EA580C; font-size: 1rem;"></i>
-            <span>Unggah Foto / Screenshot Bukti Transfer</span>
-            <input type="file" name="payment_proof" accept="image/*" style="display: none;" onchange="this.form.submit()">
-        </label>
-    </form>
 
     <!-- Tombol Selesai Bayar -->
     <form action="{{ route('order.payment.confirm', ['order_code' => $order->order_code]) }}" method="POST" style="width: 100%; display: flex; justify-content: center;">
         @csrf
         <button type="submit" class="finish-pay-btn">
-            <span>SAYA SUDAH BAYAR</span>
+            <span>SAYA SUDAH SELESAI BAYAR</span>
             <i class="fa-solid fa-circle-check"></i>
         </button>
     </form>

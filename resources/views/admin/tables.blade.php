@@ -258,7 +258,7 @@
             </select>
         </form>
 
-        <button type="button" onclick="window.print()" class="btn-primary" style="padding: 9px 18px; font-size: 0.88rem; background: #111827;">
+        <button type="button" onclick="window.print()" class="btn-primary" style="padding: 10px 20px; font-size: 0.92rem; font-weight: 900; background: #EA580C; color: white; border: 2.5px solid #111827; box-shadow: 3px 3px 0px #111827; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-print"></i> Cetak Semua Meja (Batch Print)
         </button>
     </div>
