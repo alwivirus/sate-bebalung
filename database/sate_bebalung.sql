@@ -87,7 +87,7 @@ INSERT INTO `menus` (`id`, `category_id`, `name`, `slug`, `description`, `price`
 (12, 2, 'Air Jeruk / Panas', 'air-jeruk-panas', 'Perasan jeruk murni hangat kaya vitamin C.', 8000.00, 'images/menus/jeruk_panas.jpg', 'HANGAT', 1, 12, NOW(), NOW()),
 (13, 2, 'Es Jeruk', 'es-jeruk', 'Perasan jeruk segar asli dingin nikmat.', 10000.00, 'images/menus/es_jeruk.jpg', 'FAVORIT', 1, 13, NOW(), NOW()),
 (14, 2, 'Teh Poci', 'teh-poci', 'Teh poci tanah liat tradisional disajikan hangat dengan gula batu.', 15000.00, 'images/menus/teh_poci.jpg', 'KLASIK', 1, 14, NOW(), NOW()),
-(15, 2, 'Kopi Toebroek', 'kopi-toebroek', 'Kopi hitam tubruk biji kopi nusantara pilihan harum mantap.', 5000.00, 'images/menus/kopi_toebroek.svg', 'MANTAP', 1, 15, NOW(), NOW());
+(15, 2, 'Kopi Toebroek', 'kopi-toebroek', 'Kopi hitam tubruk biji kopi nusantara pilihan harum mantap.', 5000.00, 'images/menus/kopi_toebroek.jpg', 'MANTAP', 1, 15, NOW(), NOW());
 
 -- --------------------------------------------------------
 -- Table: tables

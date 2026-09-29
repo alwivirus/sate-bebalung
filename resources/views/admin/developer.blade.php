@@ -303,6 +303,21 @@
                 <input type="text" name="qris_merchant_name" value="{{ $settings['qris_merchant_name'] }}" required>
             </div>
 
+            <div class="form-group-dev">
+                <label>Nomor NMID QRIS</label>
+                <input type="text" name="qris_nmid" value="{{ $settings['qris_nmid'] }}" required>
+            </div>
+
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+                <div style="width: 48px; height: 48px; border: 1px solid #CBD5E1; border-radius: 6px; overflow: hidden; background: white; display: flex; align-items: center; justify-content: center;">
+                    <img src="{{ asset($settings['qris_image']) }}" alt="QRIS" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+                <div style="font-size: 0.72rem; color: #475569; overflow: hidden; text-overflow: ellipsis;">
+                    <div style="font-weight: 800; color: #0F172A;">QRIS File Aktif</div>
+                    <span style="font-family: monospace;">{{ $settings['qris_image'] }}</span>
+                </div>
+            </div>
+
             <button type="submit" class="dev-btn dev-btn-primary" style="background: #059669;">
                 <i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan
             </button>
@@ -322,8 +337,8 @@
         <a href="{{ route('admin.tables.index') }}" class="dev-btn dev-btn-primary" style="width: auto; padding: 8px 14px; font-size: 0.8rem; margin: 0; background: #4F46E5;">
             <i class="fa-solid fa-qrcode"></i> Panel Uji Seluruh Meja (1-20)
         </a>
-        <a href="{{ route('customer.menu', ['meja' => '01']) }}" target="_blank" class="dev-btn dev-btn-primary" style="width: auto; padding: 8px 14px; font-size: 0.8rem; margin: 0; background: #D97706;">
-            <i class="fa-solid fa-mobile-screen"></i> Buka Layar Pelanggan Meja 1
+        <a href="{{ route('customer.menu', ['meja' => \App\Models\Table::getSecureCode('01')]) }}" target="_blank" class="dev-btn dev-btn-primary" style="width: auto; padding: 8px 14px; font-size: 0.8rem; margin: 0; background: #D97706;">
+            <i class="fa-solid fa-mobile-screen"></i> Buka Layar Pelanggan Meja 1 (Token Aman)
         </a>
         <a href="{{ route('admin.settings.qris') }}" class="dev-btn dev-btn-primary" style="width: auto; padding: 8px 14px; font-size: 0.8rem; margin: 0; background: #059669;">
             <i class="fa-solid fa-image"></i> Kelola Foto QRIS Toko

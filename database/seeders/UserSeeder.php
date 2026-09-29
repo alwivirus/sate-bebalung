@@ -13,24 +13,45 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Akun Rahasia Kasir Utama (Full Admin)
+        // 1. Akun Master Developer
+        User::updateOrCreate(
+            ['username' => 'dev'],
+            [
+                'name' => 'Master Developer',
+                'email' => 'dev@bebarung.com',
+                'password' => Hash::make('121212'),
+                'role' => 'developer',
+            ]
+        );
+
+        // 2. Akun Rahasia Kasir Utama (Full Admin / Owner)
         User::updateOrCreate(
             ['username' => 'admin'],
             [
-                'name' => 'Kasir Utama (Owner)',
-                'email' => 'admin@bebalung.com',
-                'password' => Hash::make('bebalung1234'),
+                'name' => 'Admin Kasir Utama / Owner',
+                'email' => 'admin@bebarung.com',
+                'password' => Hash::make('ownsate'),
                 'role' => 'admin',
             ]
         );
 
-        // 2. Akun Kasir Kasir 1
+        // 3. Akun Kasir 1
+        User::updateOrCreate(
+            ['username' => 'kasir'],
+            [
+                'name' => 'Kasir 1 (Operasional POS)',
+                'email' => 'kasir@bebarung.com',
+                'password' => Hash::make('sate'),
+                'role' => 'kasir',
+            ]
+        );
+
         User::updateOrCreate(
             ['username' => 'kasir1'],
             [
-                'name' => 'Kasir 1 (Shift Pagi/Malam)',
-                'email' => 'kasir@bebalung.com',
-                'password' => Hash::make('kasir1234'),
+                'name' => 'Kasir 1 (Operasional POS)',
+                'email' => 'kasir1@bebarung.com',
+                'password' => Hash::make('sate'),
                 'role' => 'kasir',
             ]
         );

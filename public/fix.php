@@ -8,8 +8,27 @@ echo "<h2>🛠️ Memperbaiki Database, Role Akun Terpisah (Dev vs Admin Kasir),
 
 // 1. Database auto-fix
 try {
-    $pdo = new PDO('mysql:host=127.0.0.1;dbname=bebs9762_bebalung;charset=utf8mb4', 'bebs9762_bebalung', 'satemaknyus10_');
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = null;
+    $dbConfigs = [
+        ['mysql:host=127.0.0.1;dbname=sate_bebalung;charset=utf8mb4', 'root', ''],
+        ['mysql:host=localhost;dbname=sate_bebalung;charset=utf8mb4', 'root', ''],
+        ['mysql:host=127.0.0.1;dbname=bebs9762_bebalung;charset=utf8mb4', 'bebs9762_bebalung', 'satemaknyus10_'],
+        ['mysql:host=localhost;dbname=bebs9762_bebalung;charset=utf8mb4', 'bebs9762_bebalung', 'satemaknyus10_'],
+    ];
+
+    foreach ($dbConfigs as $cfg) {
+        try {
+            $pdo = new PDO($cfg[0], $cfg[1], $cfg[2]);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            break;
+        } catch (\Throwable $ex) {
+            continue;
+        }
+    }
+
+    if (!$pdo) {
+        throw new Exception("Tidak dapat terhubung ke database MySQL lokal maupun server.");
+    }
 
     // Cek kolom order_status di orders dan ubah ke VARCHAR(50) agar tidak error truncation
     $cols = $pdo->query("SHOW COLUMNS FROM orders LIKE 'order_status'")->fetchAll();
@@ -37,20 +56,20 @@ try {
         echo "<p style='color:green;'>✅ Kolom <b>menu_name</b> berhasil ditambahkan ke tabel order_items!</p>";
     }
 
-    // Akun 1: Master Developer (Role: developer, Password: 'dev123')
-    $devHash = password_hash('dev123', PASSWORD_BCRYPT);
+    // Akun 1: Master Developer (Role: developer, Password: '121212')
+    $devHash = password_hash('121212', PASSWORD_BCRYPT);
     $pdo->exec("INSERT INTO users (id, name, username, role, email, password, created_at, updated_at) 
         VALUES (99, 'Master Developer', 'dev', 'developer', 'dev@bebarung.com', '$devHash', NOW(), NOW())
         ON DUPLICATE KEY UPDATE password='$devHash', role='developer', name='Master Developer'");
 
-    // Akun 2: Admin Kasir Utama / Owner (Role: admin, Password: 'admin123')
-    $passHash = password_hash('admin123', PASSWORD_BCRYPT);
+    // Akun 2: Admin Kasir Utama / Owner (Role: admin, Password: 'ownsate')
+    $passHash = password_hash('ownsate', PASSWORD_BCRYPT);
     $pdo->exec("INSERT INTO users (id, name, username, role, email, password, created_at, updated_at) 
         VALUES (1, 'Admin Kasir Utama / Owner', 'admin', 'admin', 'admin@bebarung.com', '$passHash', NOW(), NOW())
         ON DUPLICATE KEY UPDATE password='$passHash', role='admin', name='Admin Kasir Utama / Owner'");
 
-    // Akun 3: Kasir Reguler (Role: kasir, Password: 'password')
-    $kasirHash = password_hash('password', PASSWORD_BCRYPT);
+    // Akun 3: Kasir Reguler (Role: kasir, Password: 'sate')
+    $kasirHash = password_hash('sate', PASSWORD_BCRYPT);
     $pdo->exec("INSERT INTO users (id, name, username, role, email, password, created_at, updated_at) 
         VALUES (2, 'Kasir 1', 'kasir', 'kasir', 'kasir@bebarung.com', '$kasirHash', NOW(), NOW())
         ON DUPLICATE KEY UPDATE password='$kasirHash', role='kasir', name='Kasir 1'");
@@ -70,10 +89,12 @@ try {
     $pdo->exec("SET FOREIGN_KEY_CHECKS=1");
 
     $pdo->exec("INSERT INTO categories (id, name, slug, icon, sort_order, created_at, updated_at) VALUES 
-        (1, 'MENU MAKANAN', 'makanan', 'fa-utensils', 1, NOW(), NOW()),
-        (2, 'MENU MINUMAN', 'minuman', 'fa-mug-hot', 2, NOW(), NOW())");
+        (1, 'MAKANAN', 'makanan', 'fa-utensils', 1, NOW(), NOW()),
+        (2, 'MINUMAN', 'minuman', 'fa-mug-hot', 2, NOW(), NOW()),
+        (3, 'PAKET', 'paket', 'fa-box-open', 3, NOW(), NOW())");
 
     $menus = [
+        // 1. MAKANAN
         [1, 'Sate Kambing (Polos)', 'sate-kambing-polos', '10 Tusuk Sate Full Daging kambing muda empuk bumbu rempah khas Be Ba Lung.', 50000, 'images/menus/sate_kambing_polos.jpg', 'BEST SELLER', 1, 1],
         [1, 'Sate Kambing (Campur)', 'sate-kambing-campur', '10 Tusuk Sate Daging + Ati / Lemak gurih renyah aroma panggangan khas.', 45000, 'images/menus/sate_kambing_campur.jpg', 'FAVORIT', 1, 2],
         [1, 'Tongseng Kambing', 'tongseng-kambing', 'Olahan daging kambing kuah tongseng gurih segar dengan irisan kol dan tomat.', 35000, 'images/menus/tongseng_kambing.jpg', 'REKOMENDASI', 1, 3],
@@ -82,13 +103,21 @@ try {
         [1, 'Sate Ayam', 'sate-ayam', 'Sate daging ayam bakar bumbu kacang gurih manis dengan taburan bawang goreng.', 20000, 'images/menus/sate_ayam.jpg', NULL, 1, 6],
         [1, 'Nasi Putih', 'nasi-putih', 'Satu porsi nasi putih hangat pulen harum.', 6000, 'images/menus/nasi_putih.jpg', NULL, 1, 7],
         [1, 'Nasi Gurih', 'nasi-gurih', 'Nasi gurih rempah santan daun jeruk dengan taburan bawang goreng.', 7500, 'images/menus/nasi_gurih.jpg', 'GURIH', 1, 8],
-        [2, 'Air Putih / Teh Tawar', 'air-putih-teh-tawar', 'Air mineral / teh tawar hangat segar higienis.', 2000, 'images/menus/air_putih.jpg', NULL, 1, 9],
-        [2, 'Es Teh Tawar', 'es-teh-tawar', 'Es teh tawar dingin segar pelepas dahaga.', 3000, 'images/menus/es_teh_tawar.jpg', NULL, 1, 10],
-        [2, 'Es Teh Manis', 'es-teh-manis', 'Es teh manis segar wangi melati asli.', 4000, 'images/menus/es_teh_manis.jpg', 'SEGAR', 1, 11],
-        [2, 'Air Jeruk / Panas', 'air-jeruk-panas', 'Perasan jeruk murni hangat kaya vitamin C.', 8000, 'images/menus/jeruk_panas.jpg', 'HANGAT', 1, 12],
-        [2, 'Es Jeruk', 'es-jeruk', 'Perasan jeruk segar asli dingin nikmat.', 10000, 'images/menus/es_jeruk.jpg', 'FAVORIT', 1, 13],
-        [2, 'Teh Poci', 'teh-poci', 'Teh poci tanah liat tradisional disajikan hangat dengan gula batu.', 15000, 'images/menus/teh_poci.jpg', 'KLASIK', 1, 14],
-        [2, 'Kopi Toebroek', 'kopi-toebroek', 'Kopi hitam tubruk biji kopi nusantara pilihan harum mantap.', 5000, 'images/menus/kopi_toebroek.svg', 'MANTAP', 1, 15]
+
+        // 2. MINUMAN
+        [2, 'Air Putih', 'air-putih', 'Air mineral segar higienis pelepas dahaga.', 2000, 'images/menus/air_putih.jpg', NULL, 1, 9],
+        [2, 'Teh Tawar', 'teh-tawar', 'Teh tawar hangat harum melati menyegarkan.', 2000, 'images/menus/teh_tawar.jpg', 'HANGAT', 1, 10],
+        [2, 'Es Teh Tawar', 'es-teh-tawar', 'Es teh tawar dingin segar pelepas dahaga.', 3000, 'images/menus/es_teh_tawar.jpg', NULL, 1, 11],
+        [2, 'Es Teh Manis', 'es-teh-manis', 'Es teh manis segar wangi melati asli.', 4000, 'images/menus/es_teh_manis.jpg', 'SEGAR', 1, 12],
+        [2, 'Air Jeruk / Panas', 'air-jeruk-panas', 'Perasan jeruk murni hangat kaya vitamin C.', 8000, 'images/menus/jeruk_panas.jpg', 'HANGAT', 1, 13],
+        [2, 'Es Jeruk', 'es-jeruk', 'Perasan jeruk segar asli dingin nikmat.', 10000, 'images/menus/es_jeruk.jpg', 'FAVORIT', 1, 14],
+        [2, 'Teh Poci', 'teh-poci', 'Teh poci tanah liat tradisional disajikan hangat dengan gula batu.', 15000, 'images/menus/teh_poci.jpg', 'KLASIK', 1, 15],
+        [2, 'Kopi Toebroek', 'kopi-toebroek', 'Kopi hitam tubruk biji kopi nusantara pilihan harum mantap.', 5000, 'images/menus/kopi_toebroek.jpg', 'MANTAP', 1, 16],
+
+        // 3. PAKET MAKANAN (Tampil per paket porsi makan)
+        [3, 'Paket Hemat Komplit', 'paket-hemat', 'Paket komplit: Nasi Putih + Tongseng Kambing + 5 Tusuk Sate Kambing + Es Teh Manis.', 22000, 'images/menus/paket_murah.jpg', 'HEMAT 22RB', 1, 17],
+        [3, 'Paket Nasi Kotak Bento', 'paket-bento-syukuran', 'Kemasan bento premium: Nasi pulen, Sate kambing empuk, Gule cup, Kerupuk & Buah.', 28000, 'images/menus/paket_bento.jpg', 'BENTO KOMPLIT', 1, 18],
+        [3, 'Paket Kenyang Sate & Gulai', 'paket-kenyang-sate-gulai', '1 Porsi Nasi Putih + 5 Tusuk Sate Kambing + Gulai Kambing Hangat + Es Teh Manis.', 35000, 'images/menus/paket_murah.jpg', 'PAKET KENYANG', 1, 19],
     ];
 
     $stmt = $pdo->prepare("INSERT INTO menus (category_id, name, slug, description, price, image, badge, is_available, sort_order, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
@@ -96,12 +125,34 @@ try {
         $stmt->execute($m);
     }
 
-    echo "<p style='color:green;'>✅ Role Akun Terpisah (Dev vs Admin Kasir), Kategori, 15 Menu Resmi, QRIS Resmi & Status Meja Bersih berhasil disinkronkan 100%!</p>";
+    echo "<p style='color:green;'>✅ Database sinkron 100%: Kategori (Makanan, Minuman, Paket), Menu Foto Sesuai Nama, & Paket Terpisah!</p>";
 } catch (\Throwable $e) {
     echo "<p style='color:red;'>⚠️ Database Notice: " . $e->getMessage() . "</p>";
 }
 
-// 2. Salin gambar
+// 2. Clear bootstrap/cache
+$cacheFiles = glob(__DIR__ . '/bootstrap/cache/*.php');
+if (!empty($cacheFiles)) {
+    foreach ($cacheFiles as $cf) {
+        @unlink($cf);
+    }
+    echo "<p style='color:green;'>✅ Cache konfigurasi lama berhasil dibersihkan!</p>";
+}
+
+// 3. Pastikan .env di cPanel terisi kredensial database yang benar
+$envPath = __DIR__ . '/.env';
+if (file_exists($envPath)) {
+    $envContent = file_get_contents($envPath);
+    if (str_contains(__DIR__, 'bebs9762') || (isset($_SERVER['HTTP_HOST']) && str_contains($_SERVER['HTTP_HOST'], 'bebalung.my.id'))) {
+        $envContent = preg_replace('/DB_DATABASE=.*/', 'DB_DATABASE=bebs9762_bebalung', $envContent);
+        $envContent = preg_replace('/DB_USERNAME=.*/', 'DB_USERNAME=bebs9762_bebalung', $envContent);
+        $envContent = preg_replace('/DB_PASSWORD=.*/', 'DB_PASSWORD=satemaknyus10_', $envContent);
+        @file_put_contents($envPath, $envContent);
+        echo "<p style='color:green;'>✅ File .env berhasil diperbarui dengan koneksi database cPanel!</p>";
+    }
+}
+
+// 4. Salin gambar
 function copyDir($src, $dst) {
     @mkdir($dst, 0755, true);
     if (!is_dir($src)) return;

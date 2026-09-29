@@ -166,16 +166,21 @@
 </div>
 
 <!-- Banner Penegasan Catatan Aktivitas -->
-<div style="background: #FEF3C7; border: 1.5px solid #F59E0B; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; color: #92400E; font-size: 0.85rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <i class="fa-solid fa-clipboard-check" style="font-size: 1.4rem; color: #D97706;"></i>
+<div style="background: #FEF3C7; border: 1.5px solid #F59E0B; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; color: #92400E; font-size: 0.85rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+    <div style="display: flex; align-items: center; gap: 10px; max-width: 600px;">
+        <i class="fa-solid fa-clipboard-check" style="font-size: 1.5rem; color: #D97706;"></i>
         <div>
-            <strong>Catatan Aktivitas Keuangan:</strong> Transaksi <strong>Cash (Bayar di Kasir)</strong> maupun <strong>QRIS</strong> otomatis disimpan ke database bersama rincian Hari, Tanggal, Bulan, Tahun, Jam, dan Nominal Uang Masuk.
+            <strong>Catatan Aktivitas Keuangan:</strong> Transaksi <strong>Cash (Kasir)</strong> maupun <strong>QRIS</strong> otomatis tersimpan di database bersama rincian Hari, Tanggal, Jam, Menu, Nominal, dan Foto Bukti Pembayaran.
         </div>
     </div>
-    <button type="button" onclick="window.print()" class="btn-primary" style="background: #111827; color: white; padding: 6px 12px; font-size: 0.8rem;">
-        <i class="fa-solid fa-print"></i> Cetak Laporan
-    </button>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+        <a href="{{ route('admin.activity-logs.export', request()->query()) }}" class="btn-primary" style="background: #059669; color: white; padding: 8px 14px; font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;" title="Unduh CSV untuk dibuka di Google Sheets / Microsoft Excel">
+            <i class="fa-solid fa-file-excel"></i> Ekspor Google Sheets (CSV)
+        </a>
+        <button type="button" onclick="window.print()" class="btn-primary" style="background: #111827; color: white; padding: 8px 14px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 6px;" title="Cetak Laporan Teks / Simpan ke PDF">
+            <i class="fa-solid fa-print"></i> Cetak Laporan Teks
+        </button>
+    </div>
 </div>
 
 <!-- Filter & Search Bar -->

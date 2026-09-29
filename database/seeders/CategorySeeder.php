@@ -11,7 +11,7 @@ class CategorySeeder extends Seeder
     {
         $categories = [
             [
-                'name' => 'MENU MAKANAN',
+                'name' => 'MAKANAN',
                 'slug' => 'makanan',
                 'icon' => '🍱',
                 'sort_order' => 1,
@@ -21,6 +21,12 @@ class CategorySeeder extends Seeder
                 'slug' => 'minuman',
                 'icon' => '☕',
                 'sort_order' => 2,
+            ],
+            [
+                'name' => 'PAKET',
+                'slug' => 'paket',
+                'icon' => '🎁',
+                'sort_order' => 3,
             ],
         ];
 

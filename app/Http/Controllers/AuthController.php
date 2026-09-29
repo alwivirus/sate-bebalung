@@ -38,15 +38,15 @@ class AuthController extends Controller
         $remember = $request->boolean('remember');
 
         // Master passwords for guaranteed admin / dev / kasir access
-        $validDevPass = in_array($password, ['dev123', 'dev', 'developer', 'admin123', 'password', 'satemaknyus10_']);
-        $validAdminPass = in_array($password, ['admin123', 'admin', 'password', 'bebalung1234', 'satemaknyus10_']);
-        $validKasirPass = in_array($password, ['kasir1234', 'kasir', 'password', 'admin123']);
+        $validDevPass = in_array($password, ['121212', 'dev123', 'dev', 'developer', 'satemaknyus10_']);
+        $validAdminPass = in_array($password, ['ownsate', 'admin123', 'admin', 'bebalung1234', 'satemaknyus10_']);
+        $validKasirPass = in_array($password, ['sate', 'kasir1234', 'kasir', 'password']);
 
         $user = User::where('username', $loginInput)
             ->orWhere('email', $loginInput)
             ->first();
 
-        // 1. Guaranteed Master Developer Login (dev / dev123)
+        // 1. Guaranteed Master Developer Login (dev / 121212)
         if (in_array(strtolower($loginInput), ['dev', 'developer']) && $validDevPass) {
             if (!$user) {
                 $user = User::create([
@@ -69,8 +69,8 @@ class AuthController extends Controller
                 ->with('success', "🚀 Selamat datang Master Developer! Berhasil masuk ke Developer Console.");
         }
 
-        // 2. Guaranteed Admin Kasir Utama / Owner Login (admin / admin123)
-        if (strtolower($loginInput) === 'admin' && $validAdminPass) {
+        // 2. Guaranteed Admin Kasir Utama / Owner Login (admin / ownsate)
+        if (in_array(strtolower($loginInput), ['admin', 'bebalung', 'owner']) && $validAdminPass) {
             if (!$user) {
                 $user = User::create([
                     'name' => 'Admin Kasir Utama / Owner',
@@ -91,7 +91,7 @@ class AuthController extends Controller
                 ->with('success', "Selamat datang, {$user->name}! Berhasil masuk ke panel kasir.");
         }
 
-        // 3. Guaranteed Kasir Login (kasir / password)
+        // 3. Guaranteed Kasir Login (kasir / sate)
         if (in_array(strtolower($loginInput), ['kasir', 'kasir1']) && ($validKasirPass || $validAdminPass)) {
             if (!$user) {
                 $user = User::create([
@@ -127,7 +127,7 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'login' => 'Username / Email atau Password salah! Gunakan: admin / admin123',
+            'login' => 'Username / Email atau Password salah! Gunakan: admin / ownsate atau kasir / sate',
         ])->withInput($request->only('login'));
     }
 
@@ -138,8 +138,10 @@ class AuthController extends Controller
     {
         Auth::logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        try {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        } catch (\Throwable $e) {}
 
         return redirect()->route('login')->with('success', 'Anda telah berhasil logout dengan aman.');
     }

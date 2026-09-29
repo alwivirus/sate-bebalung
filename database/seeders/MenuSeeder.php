@@ -109,14 +109,24 @@ class MenuSeeder extends Seeder
         if ($minuman) {
             $minumanItems = [
                 [
-                    'name' => 'Air Putih / Teh Tawar',
-                    'slug' => 'air-putih-teh-tawar',
-                    'description' => 'Air mineral / teh tawar hangat segar higienis.',
+                    'name' => 'Air Putih',
+                    'slug' => 'air-putih',
+                    'description' => 'Air mineral segar higienis pelepas dahaga.',
                     'price' => 2000,
                     'image' => 'air_putih.jpg',
                     'badge' => null,
                     'is_available' => true,
                     'sort_order' => 1,
+                ],
+                [
+                    'name' => 'Teh Tawar',
+                    'slug' => 'teh-tawar',
+                    'description' => 'Teh tawar hangat harum melati menyegarkan.',
+                    'price' => 2000,
+                    'image' => 'teh_tawar.jpg',
+                    'badge' => 'HANGAT',
+                    'is_available' => true,
+                    'sort_order' => 2,
                 ],
                 [
                     'name' => 'Es Teh Tawar',
@@ -126,7 +136,7 @@ class MenuSeeder extends Seeder
                     'image' => 'es_teh_tawar.jpg',
                     'badge' => null,
                     'is_available' => true,
-                    'sort_order' => 2,
+                    'sort_order' => 3,
                 ],
                 [
                     'name' => 'Es Teh Manis',
@@ -136,7 +146,7 @@ class MenuSeeder extends Seeder
                     'image' => 'es_teh_manis.jpg',
                     'badge' => 'SEGAR',
                     'is_available' => true,
-                    'sort_order' => 3,
+                    'sort_order' => 4,
                 ],
                 [
                     'name' => 'Air Jeruk / Panas',
@@ -173,7 +183,7 @@ class MenuSeeder extends Seeder
                     'slug' => 'kopi-toebroek',
                     'description' => 'Kopi hitam tubruk biji kopi nusantara pilihan harum mantap.',
                     'price' => 5000,
-                    'image' => 'kopi_toebroek.svg',
+                    'image' => 'kopi_toebroek.jpg',
                     'badge' => 'MANTAP',
                     'is_available' => true,
                     'sort_order' => 7,
@@ -184,6 +194,49 @@ class MenuSeeder extends Seeder
                 Menu::updateOrCreate(
                     ['slug' => $item['slug']],
                     array_merge($item, ['category_id' => $minuman->id])
+                );
+            }
+        }
+
+        $paket = Category::where('slug', 'paket')->first();
+        if ($paket) {
+            $paketItems = [
+                [
+                    'name' => 'Paket Hemat Komplit',
+                    'slug' => 'paket-hemat',
+                    'description' => 'Paket komplit: Nasi Putih + Tongseng Kambing + 5 Tusuk Sate Kambing + Es Teh Manis.',
+                    'price' => 22000,
+                    'image' => 'paket_murah.jpg',
+                    'badge' => 'HEMAT 22RB',
+                    'is_available' => true,
+                    'sort_order' => 1,
+                ],
+                [
+                    'name' => 'Paket Nasi Kotak Bento',
+                    'slug' => 'paket-bento-syukuran',
+                    'description' => 'Kemasan bento premium: Nasi pulen, Sate kambing empuk, Gule cup, Kerupuk & Buah.',
+                    'price' => 28000,
+                    'image' => 'paket_bento.jpg',
+                    'badge' => 'BENTO KOMPLIT',
+                    'is_available' => true,
+                    'sort_order' => 2,
+                ],
+                [
+                    'name' => 'Paket Kenyang Sate & Gulai',
+                    'slug' => 'paket-kenyang-sate-gulai',
+                    'description' => '1 Porsi Nasi Putih + 5 Tusuk Sate Kambing + Gulai Kambing Hangat + Es Teh Manis.',
+                    'price' => 35000,
+                    'image' => 'paket_murah.jpg',
+                    'badge' => 'PAKET KENYANG',
+                    'is_available' => true,
+                    'sort_order' => 3,
+                ],
+            ];
+
+            foreach ($paketItems as $item) {
+                Menu::updateOrCreate(
+                    ['slug' => $item['slug']],
+                    array_merge($item, ['category_id' => $paket->id])
                 );
             }
         }

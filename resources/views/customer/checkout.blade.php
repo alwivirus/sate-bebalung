@@ -222,7 +222,7 @@
             <p style="font-size: 0.85rem; color: #4B5563; line-height: 1.4; max-width: 280px; margin: 0 auto 20px auto;">
                 Belum ada menu yang dipilih untuk Meja #{{ $tableNumber }}. Silakan pilih menu sate &amp; gulai favorit Anda terlebih dahulu.
             </p>
-            <a href="{{ route('customer.menu', ['meja' => $tableNumber]) }}" class="confirm-order-btn" style="text-decoration: none; max-width: 280px; margin: 0 auto;">
+            <a href="{{ route('customer.menu', ['meja' => \App\Models\Table::getSecureCode($tableNumber)]) }}" class="confirm-order-btn" style="text-decoration: none; max-width: 280px; margin: 0 auto;">
                 <span class="main-text">LIHAT MENU SEKARANG</span>
             </a>
         </div>
@@ -246,8 +246,8 @@
             <div class="dashed-divider"></div>
 
             <div class="total-row">
-                <div class="total-label">TOTAL</div>
-                <div class="total-price-box">Rp {{ number_format($totalAmount, 0, ',', '.') }}</div>
+                <div class="total-label">TOTAL BAYAR</div>
+                <div class="total-price-box" id="displayTotalPrice">Rp {{ number_format($totalAmount, 0, ',', '.') }}</div>
             </div>
         </div>
 
@@ -270,7 +270,10 @@
                     <div class="payment-icon-box online">
                         <i class="fa-solid fa-qrcode"></i>
                     </div>
-                    <div class="payment-title">BAYAR ONLINE</div>
+                    <div>
+                        <div class="payment-title">BAYAR ONLINE (QRIS)</div>
+                        <div style="font-size: 0.70rem; color: #059669; font-weight: 800; margin-top: 2px;">BCA, Mandiri, GoPay, OVO, ShopeePay (Tanpa Admin)</div>
+                    </div>
                 </div>
                 <div class="radio-circle"></div>
             </div>
@@ -281,7 +284,10 @@
                     <div class="payment-icon-box kasir">
                         <i class="fa-solid fa-cash-register"></i>
                     </div>
-                    <div class="payment-title">BAYAR DI KASIR</div>
+                    <div>
+                        <div class="payment-title">BAYAR DI KASIR</div>
+                        <div style="font-size: 0.70rem; color: #059669; font-weight: 800; margin-top: 2px;">Cash / Tunai di Meja Kasir</div>
+                    </div>
                 </div>
                 <div class="radio-circle"></div>
             </div>
@@ -347,10 +353,10 @@
             <!-- Konfirmasi Pesanan Button -->
             <button type="submit" class="confirm-order-btn">
                 <span class="main-text">KONFIRMASI PESANAN</span>
-                <span class="sub-text">Total: Rp {{ number_format($totalAmount, 0, ',', '.') }}</span>
+                <span class="sub-text" id="btnTotalDisplay">Total: Rp {{ number_format($totalAmount, 0, ',', '.') }}</span>
             </button>
 
-            <a href="{{ route('customer.menu', ['meja' => $tableNumber]) }}" class="back-link">
+            <a href="{{ route('customer.menu', ['meja' => \App\Models\Table::getSecureCode($tableNumber)]) }}" class="back-link">
                 <i class="fa-solid fa-chevron-left"></i> Ubah Pesanan / Kembali ke Menu
             </a>
         </form>
@@ -360,17 +366,29 @@
 
 @section('scripts')
 <script>
+    const baseSubtotal = {{ $totalAmount }};
+
+    function formatRupiah(num) {
+        return 'Rp ' + Number(num).toLocaleString('id-ID');
+    }
+
     function selectPayment(method) {
         document.getElementById('selectedPaymentMethod').value = method;
         
         document.getElementById('opt-online').classList.remove('active');
         document.getElementById('opt-kasir').classList.remove('active');
 
+        const displayTotal = document.getElementById('displayTotalPrice');
+        const btnTotal = document.getElementById('btnTotalDisplay');
+
         if (method === 'online') {
             document.getElementById('opt-online').classList.add('active');
         } else {
             document.getElementById('opt-kasir').classList.add('active');
         }
+        
+        if (displayTotal) displayTotal.innerText = formatRupiah(baseSubtotal);
+        if (btnTotal) btnTotal.innerText = 'Total: ' + formatRupiah(baseSubtotal);
     }
 
     const payForm = document.getElementById('paymentForm');

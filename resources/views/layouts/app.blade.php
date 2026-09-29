@@ -37,7 +37,12 @@
         }
 
         body {
-            background-color: #D1D5DB;
+            background-color: #0F172A;
+            background-image: 
+                radial-gradient(rgba(255, 183, 3, 0.18) 1.5px, transparent 1.5px),
+                radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
             color: var(--text-dark);
             min-height: 100vh;
             display: flex;
@@ -47,11 +52,15 @@
         .mobile-container {
             width: 100%;
             max-width: 480px;
-            background-color: #E5E7EB;
+            background-color: #F8FAFC;
+            background-image: radial-gradient(#CBD5E1 1.2px, transparent 1.2px);
+            background-size: 16px 16px;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-left: 3px solid #1E1E1E;
+            border-right: 3px solid #1E1E1E;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.35);
             position: relative;
         }
 
@@ -113,6 +122,11 @@
         .category-icon-box.drink {
             background-color: #FBBF24;
             color: #1E1E1E;
+        }
+
+        .category-icon-box.paket {
+            background-color: #EA580C;
+            color: #FFFFFF;
         }
 
         /* Footer Section */
@@ -209,8 +223,10 @@
             </div>
             
             <div class="footer-info">
-                <strong>Lokasi :</strong>
-                <p>Jl. Supriyadi No. 40, Purwokerto</p>
+                @if(request()->routeIs('customer.showcase'))
+                    <strong>Lokasi :</strong>
+                    <p>Jl. Supriyadi No.40, Sokayasa, Purwokerto Wetan, Kec. Purwokerto Tim., Kabupaten Banyumas, Jawa Tengah 53146</p>
+                @endif
                 
                 <strong>Jam Operasional :</strong>
                 <p>Senin - Minggu (Pukul 10.00 - 21.00 WIB)</p>
@@ -220,11 +236,6 @@
             </div>
         </footer>
     </div>
-
-    <!-- Chatbot Rekomendasi Menu Pintar (HANYA tampil di halaman menu utama saat memilih makanan, TIDAK tampil di checkout, pembayaran QRIS, ataupun struk sukses) -->
-    @if(request()->routeIs('customer.menu') || request()->is('/') || (request()->path() === '/'))
-        @include('components.chatbot')
-    @endif
 
     @yield('scripts')
 </body>

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Kelola Menu - Depot Sate Be Ba Lung')
-@section('page-title', 'Kelola Menu Restoran (CRUD)')
+@section('page-title', 'Kelola Menu Restoran')
 
 @section('styles')
 <style>
@@ -106,14 +106,20 @@
 @endsection
 
 @section('content')
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
     <div>
         <h3 style="font-size: 1.1rem; font-weight: 800;">Daftar Menu & Kategori</h3>
-        <p style="font-size: 0.8rem; color: #6B7280;">Tambah, edit harga, dan atur ketersediaan stok makanan/minuman.</p>
+        <p style="font-size: 0.8rem; color: #6B7280;">Kelola daftar hidangan dan atur ketersediaan stok makanan &amp; minuman.</p>
     </div>
-    <button type="button" class="btn-primary" onclick="openAddModal()">
-        <i class="fa-solid fa-plus"></i> Tambah Menu Baru
-    </button>
+    @if(in_array(auth()->user()->role ?? 'admin', ['admin', 'developer']))
+        <button type="button" class="btn-primary" onclick="openAddModal()">
+            <i class="fa-solid fa-plus"></i> Tambah Menu Baru
+        </button>
+    @else
+        <div style="background: #FEF3C7; border: 1.5px solid #F59E0B; padding: 6px 12px; border-radius: 8px; font-size: 0.78rem; font-weight: 800; color: #92400E; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-lock"></i> Mode Kasir: Hanya Ubah Ketersediaan Stok
+        </div>
+    @endif
 </div>
 
 @foreach($categories as $category)
@@ -155,7 +161,7 @@
                             <form action="{{ route('admin.menus.toggle', $menu->id) }}" method="POST" style="display: inline;">
                                 @csrf
                                 @method('PATCH')
-                                <button type="submit" class="btn-sm btn-toggle">
+                                <button type="submit" class="btn-sm btn-toggle" title="Klik untuk ubah status ketersediaan">
                                     @if($menu->is_available)
                                         <i class="fa-solid fa-circle-check" style="color: #059669;"></i> Tersedia
                                     @else
@@ -165,19 +171,23 @@
                             </form>
                         </td>
                         <td style="text-align: right;">
-                            <div style="display: inline-flex; gap: 6px;">
-                                <button type="button" class="btn-sm btn-edit" onclick='openEditModal(@json($menu))'>
-                                    <i class="fa-solid fa-pen-to-square"></i> Edit
-                                </button>
-                                
-                                <form action="{{ route('admin.menus.destroy', $menu->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus menu ini?')" style="display: inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn-sm btn-delete">
-                                        <i class="fa-solid fa-trash"></i>
+                            @if(in_array(auth()->user()->role ?? 'admin', ['admin', 'developer']))
+                                <div style="display: inline-flex; gap: 6px;">
+                                    <button type="button" class="btn-sm btn-edit" onclick='openEditModal(@json($menu))'>
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
                                     </button>
-                                </form>
-                            </div>
+                                    
+                                    <form action="{{ route('admin.menus.destroy', $menu->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus menu ini?')" style="display: inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-sm btn-delete">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            @else
+                                <span style="font-size: 0.75rem; color: #9CA3AF; font-weight: 700;">Hanya Stok</span>
+                            @endif
                         </td>
                     </tr>
                 @empty
@@ -187,7 +197,6 @@
                 @endforelse
             </tbody>
         </table>
-    </div>
 @endforeach
 
 <!-- Modal Tambah Menu -->

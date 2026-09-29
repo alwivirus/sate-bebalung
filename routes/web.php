@@ -15,10 +15,12 @@ use Illuminate\Support\Facades\Route;
 // Autentikasi Rahasia Kasir & Kasir Utama (Admin)
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Alur Pelanggan (Scan Meja)
+// Alur Pelanggan (Scan Meja Terproteksi)
 Route::get('/', [OrderController::class, 'index'])->name('customer.menu');
+Route::get('/meja/{token}', [OrderController::class, 'scanMeja'])->name('customer.meja.scan');
+Route::get('/m/{token}', [OrderController::class, 'scanMeja'])->name('customer.meja.short');
 Route::match(['get', 'post'], '/checkout', [OrderController::class, 'checkout'])->name('customer.checkout');
 Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
 
@@ -35,6 +37,7 @@ Route::post('/order/{order_code}/upload-proof', [OrderController::class, 'upload
 
 Route::get('/success', [OrderController::class, 'latestSuccess'])->name('order.success.latest');
 Route::get('/order/{order_code}/success', [OrderController::class, 'success'])->name('order.success');
+Route::get('/order/{order_code}/receipt', [OrderController::class, 'receipt'])->name('order.receipt');
 Route::get('/order/{order_code}/status', [OrderController::class, 'status'])->name('order.status');
 
 // Panel Rahasia Kasir / Admin / Dapur (Dilindungi Password & Sesi Login)
@@ -60,19 +63,27 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // Catatan Aktivitas Pembayaran & Uang Masuk
     Route::get('/activity-logs', [AdminController::class, 'activityLogs'])->name('activity-logs');
+    Route::get('/activity-logs/export', [AdminController::class, 'exportActivityLogs'])->name('activity-logs.export');
 
     // Kelola & Cetak QR Meja Pelanggan (Meja 1, Meja 2, dst)
     Route::get('/tables', [AdminController::class, 'tablesIndex'])->name('tables.index');
+    Route::get('/tables/print-all', [AdminController::class, 'printAllTables'])->name('tables.print-all');
     Route::get('/tables/{table_number}/print', [AdminController::class, 'printSingleTable'])->name('tables.print-single');
     Route::post('/tables/{table_number}/release', [AdminController::class, 'releaseTable'])->name('tables.release');
 
     // Pengaturan QRIS Pembayaran Toko
     Route::get('/settings/qris', [AdminController::class, 'qrisIndex'])->name('settings.qris');
     Route::post('/settings/qris', [AdminController::class, 'updateQris'])->name('settings.qris.update');
+    Route::get('/settings/qris/print', [AdminController::class, 'printQrisStandee'])->name('settings.qris.print');
+    Route::post('/settings/qris/reset', [AdminController::class, 'resetQris'])->name('settings.qris.reset');
 
-    // Edit Profil Akun, Email & Ganti Password Admin/Kasir
+    // Kelola Akun & Role Staff Bebalung / Admin Kasir Utama
     Route::get('/profile', [AdminController::class, 'profileIndex'])->name('profile');
     Route::post('/profile', [AdminController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
+    Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{id}', [AdminController::class, 'destroyUser'])->name('users.destroy');
+    Route::post('/users/{id}/reset-password', [AdminController::class, 'resetUserPassword'])->name('users.reset-password');
 
     // Panel Khusus Developer & Master Testing Tools
     Route::get('/developer', [AdminController::class, 'developerIndex'])->name('developer.index');

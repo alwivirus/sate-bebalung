@@ -49,9 +49,30 @@ return [
             'url' => env('DB_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', ''),
+            'database' => (function() {
+                $isCpanel = (isset($_SERVER['HTTP_HOST']) && str_contains($_SERVER['HTTP_HOST'], 'bebalung.my.id')) 
+                    || (str_contains(__DIR__, 'bebs9762') || str_contains(__DIR__, 'home/'));
+                if ($isCpanel && (empty(env('DB_DATABASE')) || env('DB_DATABASE') === 'sate_bebalung' || env('DB_DATABASE') === 'laravel')) {
+                    return 'bebs9762_bebalung';
+                }
+                return env('DB_DATABASE', 'sate_bebalung');
+            })(),
+            'username' => (function() {
+                $isCpanel = (isset($_SERVER['HTTP_HOST']) && str_contains($_SERVER['HTTP_HOST'], 'bebalung.my.id')) 
+                    || (str_contains(__DIR__, 'bebs9762') || str_contains(__DIR__, 'home/'));
+                if ($isCpanel && (empty(env('DB_USERNAME')) || env('DB_USERNAME') === 'root')) {
+                    return 'bebs9762_bebalung';
+                }
+                return env('DB_USERNAME', 'root');
+            })(),
+            'password' => (function() {
+                $isCpanel = (isset($_SERVER['HTTP_HOST']) && str_contains($_SERVER['HTTP_HOST'], 'bebalung.my.id')) 
+                    || (str_contains(__DIR__, 'bebs9762') || str_contains(__DIR__, 'home/'));
+                if ($isCpanel && empty(env('DB_PASSWORD'))) {
+                    return 'satemaknyus10_';
+                }
+                return env('DB_PASSWORD', '');
+            })(),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => env('DB_CHARSET', 'utf8mb4'),
             'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),

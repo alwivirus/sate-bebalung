@@ -192,7 +192,7 @@
             <div class="store-name">DEPOT SATE BE BA LUNG</div>
             <div class="store-sub">
                 Sop & Gulai Kambing Khas Banyumas<br>
-                Jl. Supriyadi No. 40, Purwokerto Wetan<br>
+                Jl. Supriyadi No.40, Sokayasa, Purwokerto Wetan, Kec. Purwokerto Tim., Banyumas 53146<br>
                 Telp/WA: +62 812-2591-1012
             </div>
         </div>
@@ -213,12 +213,16 @@
             <span>{{ $order->customer_name }}</span>
         </div>
         <div class="info-row">
-            <span>WAKTU:</span>
-            <span>{{ $order->created_at->format('d/m/Y H:i:s') }}</span>
+            <span>WAKTU BELI:</span>
+            <strong>{{ $order->created_at ? $order->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i:s') : now('Asia/Jakarta')->format('d/m/Y H:i:s') }} WIB</strong>
+        </div>
+        <div class="info-row">
+            <span>WAKTU CETAK:</span>
+            <strong id="printTimestamp">{{ now('Asia/Jakarta')->format('d/m/Y H:i:s') }} WIB</strong>
         </div>
         <div class="info-row">
             <span>KASIR:</span>
-            <span>KASIR UTAMA</span>
+            <span>{{ auth()->check() ? auth()->user()->name : 'KASIR UTAMA' }}</span>
         </div>
 
         <div class="divider-single"></div>
@@ -247,10 +251,6 @@
                 <span>SUBTOTAL:</span>
                 <span>Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
             </div>
-            <div class="info-row">
-                <span>PAJAK / SERVICE:</span>
-                <span>Rp 0</span>
-            </div>
             <div class="total-row-main">
                 <span>TOTAL AKHIR:</span>
                 <span>{{ $order->formatted_total }}</span>
@@ -267,69 +267,84 @@
 
         <div class="divider-double"></div>
 
-        <!-- Barcode Graphic -->
-        <div class="barcode-section">
-            <svg width="220" height="35" viewBox="0 0 220 35">
-                <rect x="0" y="0" width="3" height="35" fill="#000"/>
-                <rect x="5" y="0" width="2" height="35" fill="#000"/>
-                <rect x="9" y="0" width="5" height="35" fill="#000"/>
-                <rect x="17" y="0" width="2" height="35" fill="#000"/>
-                <rect x="21" y="0" width="4" height="35" fill="#000"/>
-                <rect x="28" y="0" width="2" height="35" fill="#000"/>
-                <rect x="33" y="0" width="6" height="35" fill="#000"/>
-                <rect x="42" y="0" width="3" height="35" fill="#000"/>
-                <rect x="48" y="0" width="2" height="35" fill="#000"/>
-                <rect x="53" y="0" width="5" height="35" fill="#000"/>
-                <rect x="61" y="0" width="2" height="35" fill="#000"/>
-                <rect x="66" y="0" width="4" height="35" fill="#000"/>
-                <rect x="73" y="0" width="7" height="35" fill="#000"/>
-                <rect x="83" y="0" width="3" height="35" fill="#000"/>
-                <rect x="89" y="0" width="2" height="35" fill="#000"/>
-                <rect x="94" y="0" width="5" height="35" fill="#000"/>
-                <rect x="102" y="0" width="3" height="35" fill="#000"/>
-                <rect x="108" y="0" width="2" height="35" fill="#000"/>
-                <rect x="113" y="0" width="6" height="35" fill="#000"/>
-                <rect x="122" y="0" width="4" height="35" fill="#000"/>
-                <rect x="129" y="0" width="2" height="35" fill="#000"/>
-                <rect x="134" y="0" width="5" height="35" fill="#000"/>
-                <rect x="142" y="0" width="5" height="35" fill="#000"/>
-                <rect x="150" y="0" width="2" height="35" fill="#000"/>
-                <rect x="155" y="0" width="6" height="35" fill="#000"/>
-                <rect x="164" y="0" width="3" height="35" fill="#000"/>
-                <rect x="170" y="0" width="4" height="35" fill="#000"/>
-                <rect x="177" y="0" width="5" height="35" fill="#000"/>
-                <rect x="185" y="0" width="2" height="35" fill="#000"/>
-                <rect x="190" y="0" width="4" height="35" fill="#000"/>
-                <rect x="197" y="0" width="3" height="35" fill="#000"/>
-                <rect x="204" y="0" width="6" height="35" fill="#000"/>
-                <rect x="214" y="0" width="3" height="35" fill="#000"/>
-            </svg>
-            <div style="font-size: 0.75rem; letter-spacing: 2px; margin-top: 4px;">{{ $order->order_code }}</div>
+        <!-- Real Scannable Barcode -->
+        <div class="barcode-section" style="text-align: center; margin: 10px 0 6px;">
+            <svg id="receiptCode128" style="max-width: 100%; height: 42px;"></svg>
+            <div style="font-size: 0.78rem; font-weight: 700; letter-spacing: 2px; margin-top: 2px;">{{ $order->order_code }}</div>
         </div>
 
         <div class="receipt-footer">
             *** TERIMA KASIH ***<br>
             Selamat Menikmati Hidangan Kami<br>
-            Kritik &amp; Saran: +62 812-2591-1012
+            Kritik &amp; Saran WA: 0877 3071 2015
         </div>
     </div>
 
     <!-- Floating Action Toolbar -->
     <div class="print-toolbar">
-        <button type="button" class="btn-action" onclick="window.print()">
-            <i class="fa-solid fa-print"></i> Cetak Struk
-        </button>
+        @if(auth()->check())
+            <button type="button" class="btn-action" onclick="handlePrint()">
+                <i class="fa-solid fa-print"></i> Cetak Struk (POS)
+            </button>
+        @endif
         <button type="button" class="btn-action" style="background: #4B5563;" onclick="window.close()">
-            <i class="fa-solid fa-xmark"></i> Tutup
+            <i class="fa-solid fa-xmark"></i> Tutup Struk
         </button>
     </div>
 
+    <!-- JsBarcode for Ultra-Sharp Thermal Printer Barcode -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script>
-        // Auto trigger print dialog on page load
+        function renderBarcode() {
+            try {
+                if (typeof JsBarcode === 'function') {
+                    JsBarcode("#receiptCode128", "{{ $order->order_code }}", {
+                        format: "CODE128",
+                        lineColor: "#000000",
+                        width: 2,
+                        height: 40,
+                        displayValue: false,
+                        margin: 0,
+                        background: "#FFFFFF"
+                    });
+                }
+            } catch (e) {
+                console.error('Barcode render error:', e);
+            }
+        }
+
+        // Update Waktu Cetak to exact current second
+        function updatePrintTime() {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const el = document.getElementById('printTimestamp');
+            if (el) {
+                el.innerText = `${day}/${month}/${year} ${hours}:${minutes}:${seconds} WIB`;
+            }
+        }
+
+        function handlePrint() {
+            updatePrintTime();
+            window.print();
+        }
+
+        // Auto update when print dialog opens
+        window.addEventListener('beforeprint', updatePrintTime);
+
         window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                window.print();
-            }, 500);
+            renderBarcode();
+            updatePrintTime();
+            @if(auth()->check())
+                // Hanya kasir/admin yang otomatis memicu print dialog browser
+                setTimeout(() => {
+                    window.print();
+                }, 600);
+            @endif
         });
     </script>
 </body>

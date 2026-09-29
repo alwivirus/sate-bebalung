@@ -13,31 +13,79 @@ use Illuminate\Support\Facades\DB;
 class OrderController extends Controller
 {
     /**
-     * Tampilan utama Menu (Scan Meja / Table QR Menu).
+     * Tampilan utama:
+     * - Jika scan QR Meja (?meja=01): Tampilkan Menu Pemesanan Aktif (customer.menu)
+     * - Jika akses langsung domain (bebalung.my.id): Tampilkan Katalog Profil Makanan Tanpa Harga (customer.showcase)
      */
     public function index(Request $request)
     {
-        $tableNumber = $request->query('meja', $request->query('table', session('table_number', '01')));
-        $customerName = $request->query('nama', session('customer_name', ''));
-
-        session(['table_number' => $tableNumber]);
-        if (!empty($customerName)) {
-            session(['customer_name' => $customerName]);
-        }
-
-        // Auto-heal categories to exact 2 categories matching menu card
+        // Auto-heal categories & menus
         try {
-            if (Category::where('slug', 'paket-murah')->exists() || Category::count() < 2 || Menu::count() < 15) {
+            if (Menu::where('slug', 'air-putih-teh-tawar')->exists() || Menu::where('slug', 'teh-tawar')->where('image', 'like', '%air_putih%')->exists()) {
+                Menu::where('slug', 'air-putih-teh-tawar')->delete();
+                (new \Database\Seeders\CategorySeeder())->run();
+                (new \Database\Seeders\MenuSeeder())->run();
+            } elseif (!Menu::where('slug', 'paket-hemat')->exists() || Category::count() < 3 || Menu::count() < 20) {
                 (new \Database\Seeders\CategorySeeder())->run();
                 (new \Database\Seeders\MenuSeeder())->run();
             }
         } catch (\Throwable $e) {}
 
+        $rawTableParam = $request->query('meja', $request->query('table', $request->query('m', '')));
+        $tokenParam = $request->query('token', $request->query('t', ''));
+        $invalidAttempt = false;
+
+        $tableNumber = null;
+        if (!empty($rawTableParam)) {
+            $tableNumber = Table::validateAndResolveTable($rawTableParam, $tokenParam);
+            if (!$tableNumber) {
+                $invalidAttempt = true;
+            }
+        }
+
+        // Jika Pelanggan Scan QR Meja Resmi & Terverifikasi (?meja=01)
+        if ($tableNumber) {
+            $customerName = $request->query('nama', session('customer_name', ''));
+
+            session(['table_number' => $tableNumber, 'table_verified' => true]);
+            if (!empty($customerName)) {
+                session(['customer_name' => $customerName]);
+            }
+
+            // Tandai meja langsung aktif/digunakan di database saat discan oleh pelanggan
+            try {
+                Table::markScanned($tableNumber, $customerName ?: 'Pelanggan (Scan HP)');
+            } catch (\Throwable $e) {}
+
+            $categories = Category::with(['menus' => function ($query) {
+                $query->where('is_available', true)->orderBy('sort_order', 'asc');
+            }])->orderBy('sort_order', 'asc')->get();
+
+            return view('customer.menu', compact('categories', 'tableNumber', 'customerName'));
+        }
+
+        // Jika Pengunjung Mengakses Tampilan Awal / Domain Langsung (Murni Katalog Publik)
+        session()->forget(['table_number', 'table_verified']);
+
         $categories = Category::with(['menus' => function ($query) {
             $query->where('is_available', true)->orderBy('sort_order', 'asc');
         }])->orderBy('sort_order', 'asc')->get();
 
-        return view('customer.menu', compact('categories', 'tableNumber', 'customerName'));
+        $scanWarning = $invalidAttempt ? 'Link meja tidak valid atau tidak lengkap. Demi keamanan dan menghindari pesanan fiktif, silakan scan QR Code resmi yang tertera langsung di meja restoran.' : null;
+
+        return view('customer.showcase', compact('categories', 'scanWarning'));
+    }
+
+    /**
+     * Rute akses langsung via URL pendek /meja/{token} atau /m/{token}
+     */
+    public function scanMeja(Request $request, $token)
+    {
+        $tableNumber = Table::validateAndResolveTable($token);
+        if ($tableNumber) {
+            return redirect()->route('customer.menu', ['meja' => Table::getSecureCode($tableNumber)]);
+        }
+        return redirect()->route('customer.menu')->with('warning', 'QR Code Meja tidak valid.');
     }
 
     /**
@@ -134,7 +182,7 @@ class OrderController extends Controller
                 'notes' => $request->input('notes'),
             ]);
 
-            $totalAmount = 0;
+            $subtotalAmount = 0;
             $hasMenuNameCol = \Illuminate\Support\Facades\Schema::hasColumn('order_items', 'menu_name');
 
             foreach ($request->input('cart_items') as $item) {
@@ -142,7 +190,7 @@ class OrderController extends Controller
                 if ($menu) {
                     $qty = max(1, (int)$item['quantity']);
                     $subtotal = $menu->price * $qty;
-                    $totalAmount += $subtotal;
+                    $subtotalAmount += $subtotal;
 
                     $itemPayload = [
                         'order_id' => $order->id,
@@ -160,6 +208,9 @@ class OrderController extends Controller
                     OrderItem::create($itemPayload);
                 }
             }
+
+            // Tidak ada biaya layanan / potongan QRIS
+            $totalAmount = $subtotalAmount;
 
             $order->update(['total_amount' => $totalAmount]);
 
@@ -225,7 +276,7 @@ class OrderController extends Controller
      */
     public function payment($order_code)
     {
-        $order = Order::with('items')->where('order_code', $order_code)->firstOrFail();
+        $order = Order::with('items.menu')->where('order_code', $order_code)->firstOrFail();
 
         return view('customer.payment', compact('order'));
     }
@@ -307,6 +358,15 @@ class OrderController extends Controller
         $order = Order::with('items.menu')->where('order_code', $order_code)->firstOrFail();
 
         return view('customer.success', compact('order'));
+    }
+
+    /**
+     * Tampilan / Cetak Struk Pesanan untuk Pelanggan & Kasir.
+     */
+    public function receipt($order_code)
+    {
+        $order = Order::with(['items.menu'])->where('order_code', $order_code)->firstOrFail();
+        return view('admin.receipt', compact('order'));
     }
 
     /**

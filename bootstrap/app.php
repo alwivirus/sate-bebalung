@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             users: '/admin'
         );
         $middleware->validateCsrfTokens(except: [
+            'logout',
             'chatbot/*',
             'api/*',
         ]);
