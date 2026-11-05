@@ -1,0 +1,21 @@
+# Use this workspace to collaborate
+workspace:
+  id: 91ee584d-5915-4f46-83f4-6cd8844fddbb
+
+localResources:
+  collections:
+    - ../Depot Sate Be Ba Lung - API Collection (PSAJ 2026)
+    - ../Kel 1 - Be Ba Lung - 02, 07, 11, 19, 28/08 Video Teknis (penjelasan
+      kode dan running teknis - postman)/Depot Sate Be Ba Lung - API Collection
+      (PSAJ 2026)
+    - ../Kel 1 - Be Ba Lung - 02, 07, 11, 19, 28/08 Video Teknis (penjelasan
+      kode dan running teknis - postman)/Depot Sate Be Ba Lung - Restaurant API
+    - ../Pengumpulan_Tugas_Kelompok_Depot_Sate_Bebalung/08 Video Teknis
+      (penjelasan kode dan running teknis - postman)/Depot Sate Be Ba Lung -
+      Restaurant API
+  environments:
+    - ../Depot_Sate_Bebalung_Environment.postman_environment.json
+    - ../Kel 1 - Be Ba Lung - 02, 07, 11, 19, 28/08 Video Teknis (penjelasan
+      kode dan running teknis -
+      postman)/Depot_Sate_Bebalung_Environment.postman_environment.json
+    - ../Depot Sate Bebalung - Localhost.environment.yaml
